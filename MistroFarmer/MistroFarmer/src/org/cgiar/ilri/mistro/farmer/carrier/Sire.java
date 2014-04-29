@@ -4,7 +4,10 @@ import org.json.me.JSONException;
 import org.json.me.JSONObject;
 
 /**
- * Created by jason on 8/5/13.
+ * This is a carrier class for data on a sire.
+ * This is a subclass of the Cow class.
+ * 
+ * @author Jason Rogena <j.rogena@cgiar.org>
  */
 public class Sire extends Cow {
     private String strawNumber;
@@ -24,6 +27,11 @@ public class Sire extends Cow {
         return strawNumber;
     }
     
+    /**
+     * This method returns a JSON object containing data on this sire.
+     * 
+     * @return A JSON object containing data on the sire or an empty JSON object.
+     */
     public JSONObject getJsonObject() {
         JSONObject jsonObject=super.getJsonObject();
         try

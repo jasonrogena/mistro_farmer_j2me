@@ -8,7 +8,9 @@ import org.json.me.JSONException;
 import org.json.me.JSONObject;
 
 /**
- * Created by jason on 8/5/13.
+ * This is a carrier class for information on a farmer.
+ * 
+ * @author Jason Rogena <j.rogena@cgiar.org>
  */
 public class Farmer {
     public static final String MODE_INITIAL_REGISTRATION = "initialRegistration";
@@ -22,6 +24,11 @@ public class Farmer {
     private String simCardSN;
     private String mode;
 
+    /**
+     * This is a constructor for the Farmer class.
+     * Use this constructor of you do not have data on the 
+     * farmer encoded as a JSONObject.
+     */
     public Farmer()
     {
         fullName="";
@@ -33,6 +40,13 @@ public class Farmer {
         mode = "";
     }
     
+    /**
+     * This is a constructor for the Farmer class.
+     * Use this constructor if you have data on the farmer
+     * encoded as a JSONObject
+     * 
+     * @param farmerJSONObject JSON object containing data on the farmer
+     */
     public Farmer(JSONObject farmerJSONObject){
         try {
             fullName = farmerJSONObject.getString("name");
@@ -55,6 +69,9 @@ public class Farmer {
         }
     }
     
+    /**
+     * Get updated data on the farmer from the server
+     */
     public void update(){
         Thread thread = new Thread(new Updater());
         thread.run();
@@ -76,6 +93,11 @@ public class Farmer {
         this.mobileNumber = mobileNumber;
     }
 
+    /**
+     * Get the nuber of cows registered under this farmer
+     * 
+     * @return int The number of cows owned by the farmer.
+     */
     public int getCowNumber() {
         if(cows!=null){
             return cows.length;
@@ -96,6 +118,11 @@ public class Farmer {
         }
     }
     
+    /**
+     * Append a new cow at the end of the list of cows owned by this farmer
+     * 
+     * @param newCow The cow to be appended to the cow list
+     */
     public void appendCow(Cow newCow){
         if(cows!=null){
             Cow[] newCowList = new Cow[cows.length+1];
@@ -112,6 +139,9 @@ public class Farmer {
         }
     }
     
+    /**
+     * Use this method to remove the last member of the cow list.
+     */
     public void unAppendCow(){
         if(cows!=null){
             Cow[] newCowList = new Cow[cows.length-1];
@@ -122,9 +152,22 @@ public class Farmer {
         }
     }
 
+    /**
+     * Use this method to initialize the list of cows registered under the farmer.
+     * 
+     * @param cows Array of cows under the farmer
+     */
     public void setCows(Cow[] cows) {
         this.cows = cows;
     }
+    
+    /**
+     * Set the index in the cow list to the provided cow.
+     * 
+     * @param cow The new cow object to be placed in provided index
+     * @param index Position on cow list to place the cow. If this index does not lie
+     *              within the size of the cow list nothing will happen.
+     */
     public void setCow(Cow cow, int index) {
         if(index<cows.length) {
             cows[index] = cow;
@@ -159,6 +202,13 @@ public class Farmer {
         return cows;
     }
 
+    /**
+     * Get cow object on the provided index in the farmer's cow list
+     * 
+     * @param index Index on the farmer's cow list
+     * 
+     * @return The cow object in the provided position on the cow list or <null> if there is no cow in specified position
+     */
     public Cow getCow(int index)
     {
         if(index<cows.length)
@@ -179,6 +229,12 @@ public class Farmer {
         return simCardSN;
     }
 
+    /**
+     * Get the JSONObject with all data on the farmer carried by this object.
+     * 
+     * @return A JSON object with data on the farmer or a blank json object if something goes 
+     *          wrong while parsing the data into the json object.
+     */
     public JSONObject getJsonObject()
     {
         JSONObject jsonObject=new JSONObject();
@@ -207,11 +263,19 @@ public class Farmer {
         return  jsonObject;
     }
     
+    /**
+     * This method sends updated data on the farmer to the server.
+     * 
+     * @param responseListener Listener that will be called when response is gotten from server
+     */
     public void syncWithServer(ResponseListener responseListener){
         Thread thread = new Thread(new DataSender(getJsonObject(), responseListener));
         thread.run();
     }
     
+    /**
+     * This class initializes a thread that sends updated farmer data to server
+     */
     private class DataSender implements Runnable{
         
         private ResponseListener responseListener;
@@ -229,6 +293,11 @@ public class Farmer {
         
     }
     
+    /**
+     * This method is called when response is gotten from server in the Update inner class
+     * 
+     * @param farmerJSONObject The json object containing data on the farmer
+     */
     private void actOnServerResponse(JSONObject farmerJSONObject){
         try {
             fullName = farmerJSONObject.getString("name");
@@ -251,6 +320,10 @@ public class Farmer {
         }
     }
     
+    /**
+     * This class creates a thread that fetches farmer data corresponding to the provided 
+     * mobile phone number from the server
+     */
     private class Updater implements Runnable{
         
         public void run() {

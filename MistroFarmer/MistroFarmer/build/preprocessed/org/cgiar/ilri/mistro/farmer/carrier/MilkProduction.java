@@ -10,13 +10,15 @@ import org.json.me.JSONException;
 import org.json.me.JSONObject;
 
 /**
- *
- * @author jason
+ * This a carrier class for data on milk production.
+ * 
+ * @author Jason Rogena <j.rogena@cgiar.org>
  */
 public class MilkProduction {
    
     public static final String QUANTITY_TYPE_KGS = "KGs";
     public static final String QUANTITY_TYPE_LITRES = "Litres";
+    public static final int MAX_MILK_PRODUCTION_DAYS = 15;
     
     private String time;
     private int quantity;

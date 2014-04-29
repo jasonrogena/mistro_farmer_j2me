@@ -24,6 +24,7 @@ import java.util.Vector;
 import org.cgiar.ilri.mistro.farmer.Midlet;
 import org.cgiar.ilri.mistro.farmer.carrier.Cow;
 import org.cgiar.ilri.mistro.farmer.carrier.Dam;
+import org.cgiar.ilri.mistro.farmer.carrier.Event;
 import org.cgiar.ilri.mistro.farmer.carrier.Farmer;
 import org.cgiar.ilri.mistro.farmer.ui.localization.ArrayResources;
 import org.cgiar.ilri.mistro.farmer.ui.localization.Locale;
@@ -33,8 +34,9 @@ import org.json.me.JSONException;
 import org.json.me.JSONObject;
 
 /**
- *
- * @author jason
+ * This class creates the Add Calving Screen in the application
+ * 
+ * @author Jason Rogena <j.rogena@cgiar.org>
  */
 public class AddCalvingScreen extends Form implements Screen{
 
@@ -54,8 +56,8 @@ public class AddCalvingScreen extends Form implements Screen{
     private Spinner dateS;
     private Label typeL;
     private ComboBox typeCB;
-    private Label birthsL;
-    private TextField birthsTF;
+    /*private Label birthsL;
+    private TextField birthsTF;*/
     
     
     public AddCalvingScreen(Midlet midlet, int locale, Farmer farmer) {
@@ -88,7 +90,7 @@ public class AddCalvingScreen extends Form implements Screen{
                         try {
                             jSONObject.put("birthType",birthTypesInEN[typeCB.getSelectedIndex()]);
                             jSONObject.put("eventType","Birth");
-                            jSONObject.put("liveBirths",birthsTF.getText());
+                            //jSONObject.put("liveBirths",birthsTF.getText());
                         } 
                         catch (JSONException ex) {
                             ex.printStackTrace();
@@ -168,7 +170,7 @@ public class AddCalvingScreen extends Form implements Screen{
         typeCB.setRenderer(new MistroListCellRenderer(Locale.getStringArrayInLocale(locale, ArrayResources.birth_types)));
         this.addComponent(typeCB);
         
-        birthsL = new Label(Locale.getStringInLocale(locale, StringResources.no_f_cow_births));
+        /*birthsL = new Label(Locale.getStringInLocale(locale, StringResources.no_f_cow_births));
         setLabelStyle(birthsL);
         this.addComponent(birthsL);
         
@@ -176,7 +178,7 @@ public class AddCalvingScreen extends Form implements Screen{
         setComponentStyle(birthsTF, false);
         birthsTF.setConstraint(TextField.NUMERIC);
         birthsTF.setInputModeOrder(new String[] {"123"});
-        this.addComponent(birthsTF);
+        this.addComponent(birthsTF);*/
     }
     
     private void setLabelStyle(Label label){
@@ -218,48 +220,43 @@ public class AddCalvingScreen extends Form implements Screen{
         return placibo;
     }
     
+    /**
+     * This method validates the input in the screen
+     * 
+     * @return <true> if all input is valid. Otherwise <false> is returned
+     */
     private boolean validateInput(){
-        final Dialog infoDialog = new Dialog();
-        infoDialog.setDialogType(Dialog.TYPE_INFO);
-        final Command backCommand = new Command(Locale.getStringInLocale(locale, StringResources.back));
-        infoDialog.addCommand(backCommand);
-        infoDialog.addCommandListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                if(evt.getCommand().equals(backCommand)){
-                    infoDialog.dispose();
-                }
-            }
-        });
-        TextArea text = new TextArea();
-        text.setEditable(false);
-        text.setFocusable(false);
-        text.getStyle().setAlignment(CENTER);
-        infoDialog.addComponent(text);
+        final InformationDialog infoDialog = new InformationDialog(locale, false);
         
-        
-        if(birthsTF.getText() == null || birthsTF.getText().trim().length()==0){
-            text.setText(Locale.getStringInLocale(locale, StringResources.enter_no_f_cow_births));
+        /*if(birthsTF.getText() == null || birthsTF.getText().trim().length()==0){
+            infoDialog.setText(Locale.getStringInLocale(locale, StringResources.enter_no_f_cow_births));
             birthsTF.requestFocus();
-            infoDialog.show(100, 100, 11, 11, true);
+            infoDialog.show();
             return false;
-        }
+        }*/
         
         if(validateDate()!=null){
-            text.setText(validateDate());
+            infoDialog.setText(validateDate());
             dateS.requestFocus();
-            infoDialog.show(100, 100, 11, 11, true);
+            infoDialog.show();
             return false;
         }
         return true;
     }
     
+    /**
+     * This method checks if the date input in screen is valid.
+     * Date should not be older than 30 days old or in the future.
+     * 
+     * @return <true> is returned if date is valid. Otherwise, <false> is returned.
+     */
     private String validateDate(){
         Date dateSelected  = (Date) dateS.getValue();
         long currentTime = System.currentTimeMillis();
         
         long timeDiffDays = (currentTime - dateSelected.getTime())/86400000;
         
-        if(timeDiffDays > 30){
+        if(timeDiffDays > Event.MAX_EVENT_DAYS){
             return Locale.getStringInLocale(locale, StringResources.milk_data_too_old);
         }
         else if(timeDiffDays < 0){
@@ -268,6 +265,10 @@ public class AddCalvingScreen extends Form implements Screen{
         
         return null;
     }
+    
+    /**
+     * Call this method when you want this screen to show for the first time.
+     */
     public void start() {
         this.show();
     }
@@ -280,81 +281,35 @@ public class AddCalvingScreen extends Form implements Screen{
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
+    /**
+     * This method is called by the EventHandler class when a response is gotten from the server.
+     * 
+     * @param message Response message from the server
+     */
     private void reactToServerResponse(String message){
         
-                System.out.println("response gotten for calf");
-               if(message == null){
-                   final Dialog infoDialog = new Dialog(Locale.getStringInLocale(locale, StringResources.error));
-                    infoDialog.setDialogType(Dialog.TYPE_ERROR);
-                    final Command backCommand = new Command(Locale.getStringInLocale(locale, StringResources.okay));
-                    infoDialog.addCommand(backCommand);
-                    infoDialog.addCommandListener(new ActionListener() {
-
-                        public void actionPerformed(ActionEvent evt) {
-                            if(evt.getCommand().equals(backCommand)){
-                                infoDialog.dispose();
-                            }
-                }
-            });
-
-            TextArea text = new TextArea(1,20);
-            text.setFocusable(false);
-            text.setWidth(30);
-            text.setEditable(false);
-            text.getStyle().setAlignment(CENTER);
-            infoDialog.addComponent(text);
-            text.setText(Locale.getStringInLocale(locale, StringResources.problem_connecting_to_server));
-            infoDialog.show(100, 100, 11, 11, true);
+       System.out.println("response gotten for calf");
+       if(message == null){
+           final InformationDialog infoDialog = new InformationDialog(Locale.getStringInLocale(locale, StringResources.error), locale, false);
+           infoDialog.setText(Locale.getStringInLocale(locale, StringResources.problem_connecting_to_server));
+           infoDialog.show();
        }
        else if(message.equals(DataHandler.ACKNOWLEDGE_OK)){
-            final Dialog infoDialog = new Dialog(Locale.getStringInLocale(locale, StringResources.success));
-            infoDialog.setDialogType(Dialog.TYPE_CONFIRMATION);
-            final Command placiboCommand = new Command("");
-            final Command backCommand = new Command(Locale.getStringInLocale(locale, StringResources.okay));
-            infoDialog.addCommand(placiboCommand);
-            infoDialog.addCommand(backCommand);
-            infoDialog.addCommandListener(new ActionListener() {
-
-                public void actionPerformed(ActionEvent evt) {
-                    if(evt.getCommand().equals(backCommand)){
-                        infoDialog.dispose();
-                        FertilityScreen fertilityScreen = new FertilityScreen(midlet, locale, farmer);
-                        fertilityScreen.start();
-                    }
-                }
-            });
-
-            Label text = new Label();
-            text.getStyle().setAlignment(CENTER);
-            infoDialog.addComponent(text);
-            text.setText(Locale.getStringInLocale(locale, StringResources.information_successfully_sent_to_server));
-            infoDialog.show(100, 100, 11, 11, true);
+            final InformationDialog infoDialog = new InformationDialog(Locale.getStringInLocale(locale, StringResources.success), locale, false);
+            infoDialog.setText(Locale.getStringInLocale(locale, StringResources.information_successfully_sent_to_server));
+            infoDialog.show();
        }
        else{
-           final Dialog infoDialog = new Dialog(Locale.getStringInLocale(locale, StringResources.error));
-            infoDialog.setDialogType(Dialog.TYPE_ERROR);
-            final Command backCommand = new Command(Locale.getStringInLocale(locale, StringResources.okay));
-            infoDialog.addCommand(backCommand);
-            infoDialog.addCommandListener(new ActionListener() {
-
-                public void actionPerformed(ActionEvent evt) {
-                    if(evt.getCommand().equals(backCommand)){
-                        infoDialog.dispose();
-                    }
-                }
-            });
-
-            TextArea text = new TextArea(1,20);
-            text.setFocusable(false);
-            text.setWidth(30);
-            text.setEditable(false);
-            text.getStyle().setAlignment(CENTER);
-            infoDialog.addComponent(text);
-            text.setText(Locale.getStringInLocale(locale, StringResources.something_went_wrong_try_again));
-            infoDialog.show(100, 100, 11, 11, true);
+           final InformationDialog infoDialog = new InformationDialog(Locale.getStringInLocale(locale, StringResources.error), locale, false);
+           infoDialog.setDialogType(Dialog.TYPE_ERROR);//TODO: check if this works, InformationDialog automatically set to TYPE_INFO
+           infoDialog.setText(Locale.getStringInLocale(locale, StringResources.something_went_wrong_try_again));
+           infoDialog.show();
        }
     }
     
+    /**
+     * This method creates a thread that sends the calving data obtained from this screen to the server.
+     */
     private class EventHandler implements Runnable{
         
         private JSONObject jSONObject;

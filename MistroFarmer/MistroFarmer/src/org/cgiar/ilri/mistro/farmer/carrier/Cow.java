@@ -7,7 +7,8 @@ import org.json.me.JSONException;
 import org.json.me.JSONObject;
 
 /**
- * Created by jason on 8/5/13.
+ * This is the carrier class for Cow data.
+ * @author Jason Rogena <j.rogena@cgiar.org>
  */
 public class Cow {
     public static final String SEX_MALE = "Male";
@@ -40,6 +41,15 @@ public class Cow {
     private MilkProduction[] milkProduction;
     private Event[] events;
 
+    /**
+     * Constructor for the Cow class.
+     * Use this constructor if you don't have a json object that can be used to
+     * initialize the object. Otherwise, use the Cow(JSONObject) constructor.
+     * 
+     * @param isNotDamOrSire Set to <true> if the cow is not a sire or dam. Be careful how 
+     *                          you initialize this variable or you a stackOverflow error might
+     *                          be thrown at you.
+     */
     public Cow(boolean isNotDamOrSire) {
         name = "";
         earTagNumber = "";
@@ -62,6 +72,13 @@ public class Cow {
         piggyBack = "";
     }
     
+    /**
+     * Constructor for the Cow class.
+     * Use this constructor if you have data for the cow encoded in a JSONObject object.
+     * Otherwise, use the Cow(boolean isNotDamOrSire) constructor
+     * 
+     * @param cowJSONObject The cow data encoded as a json object
+     */
     public Cow(JSONObject cowJSONObject){
         try {
             name = cowJSONObject.getString("name");
@@ -254,6 +271,12 @@ public class Cow {
         return events;
     }
 
+    /**
+     * Returns all the data stored in this carrier object as a json object.
+     * May include piggyback data used during calf and acquired cow registration.
+     * 
+     * @return JSONObject
+     */
     public JSONObject getJsonObject() {
         JSONObject jsonObject = new JSONObject();
         try {

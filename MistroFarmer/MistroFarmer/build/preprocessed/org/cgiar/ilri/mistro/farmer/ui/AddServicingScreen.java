@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.Vector;
 import org.cgiar.ilri.mistro.farmer.Midlet;
 import org.cgiar.ilri.mistro.farmer.carrier.Cow;
+import org.cgiar.ilri.mistro.farmer.carrier.Event;
 import org.cgiar.ilri.mistro.farmer.carrier.Farmer;
 import org.cgiar.ilri.mistro.farmer.ui.localization.ArrayResources;
 import org.cgiar.ilri.mistro.farmer.ui.localization.Locale;
@@ -54,12 +55,16 @@ public class AddServicingScreen extends Form implements Screen, ActionListener{
     private ComboBox servicingTypeCB;
     private Label vetUsedL;
     private TextField vetUsedTF;
-    private Label bullNameL;
-    private TextField bullNameTF;
+    /*private Label bullNameL;
+    private TextField bullNameTF;*/
     private Label earTagNumberL;
     private TextField earTagNumberTF;
     private Label strawNumberL;
     private TextField strawNumberTF;
+    private Label bullOwnerL;
+    private ComboBox bullOwnerCB;
+    private Label specBullOwnerL;
+    private TextField specBullOwnerTF;
     
     public AddServicingScreen(Midlet midlet, int locale, Farmer farmer) {
         super(Locale.getStringInLocale(locale, StringResources.servicing));
@@ -90,6 +95,7 @@ public class AddServicingScreen extends Form implements Screen, ActionListener{
                         try {
                             Cow selectedCow = (Cow)validCows.elementAt(cowCB.getSelectedIndex());
                             String[] sevicingTypesInEN = Locale.getStringArrayInLocale(Locale.LOCALE_EN, ArrayResources.main_service_types);
+                            String[] bullOwnersInEN = Locale.getStringArrayInLocale(Locale.LOCALE_EN, ArrayResources.bull_owners);
                             jSONObject.put("mobileNo", AddServicingScreen.this.farmer.getMobileNumber());
                             jSONObject.put("cowEarTagNumber", selectedCow.getEarTagNumber());
                             jSONObject.put("cowName", selectedCow.getName());
@@ -101,8 +107,10 @@ public class AddServicingScreen extends Form implements Screen, ActionListener{
                             jSONObject.put("eventType", sevicingTypesInEN[servicingTypeCB.getSelectedIndex()]);
                             jSONObject.put("strawNumber", strawNumberTF.getText());
                             jSONObject.put("vetUsed", vetUsedTF.getText());
-                            jSONObject.put("bullName", bullNameTF.getText());
+                            //jSONObject.put("bullName", bullNameTF.getText());
                             jSONObject.put("bullEarTagNo", earTagNumberTF.getText());
+                            jSONObject.put("bullOwner", bullOwnersInEN[bullOwnerCB.getSelectedIndex()]);
+                            jSONObject.put("bullOwnerName", specBullOwnerTF.getText());
                             Thread thread = new Thread(new EventHandler(jSONObject));
                             thread.run();
                         } 
@@ -153,19 +161,20 @@ public class AddServicingScreen extends Form implements Screen, ActionListener{
         setComponentStyle(vetUsedTF, false);
         this.addComponent(vetUsedTF);
         
-        bullNameL = new Label(Locale.getStringInLocale(locale, StringResources.bull_name));
+        /*bullNameL = new Label(Locale.getStringInLocale(locale, StringResources.bull_name));
         setLabelStyle(bullNameL);
         this.addComponent(bullNameL);
         
         bullNameTF = new TextField();
         setComponentStyle(bullNameTF, false);
-        this.addComponent(bullNameTF);
+        this.addComponent(bullNameTF);*/
         
-        earTagNumberL = new Label(Locale.getStringInLocale(locale, StringResources.ear_tag_number));
+        earTagNumberL = new Label(Locale.getStringInLocale(locale, StringResources.servicing_bull));
         setLabelStyle(earTagNumberL);
         this.addComponent(earTagNumberL);
         
         earTagNumberTF = new TextField();
+        earTagNumberTF.setHint(Locale.getStringInLocale(locale, StringResources.enter_bull_name_or_etn));
         setComponentStyle(earTagNumberTF, false);
         this.addComponent(earTagNumberTF);
         
@@ -176,6 +185,33 @@ public class AddServicingScreen extends Form implements Screen, ActionListener{
         strawNumberTF = new TextField();
         setComponentStyle(strawNumberTF, false);
         this.addComponent(strawNumberTF);
+        
+        /*
+        private Label bullOwnerL;
+    private ComboBox bullOwnerCB;
+    private Label specBullOwnerL;
+    private TextField specBullOwnerTF;
+        */
+        bullOwnerL = new Label(Locale.getStringInLocale(locale, StringResources.bull_owner));
+        setLabelStyle(bullOwnerL);
+        this.addComponent(bullOwnerL);
+        
+        String[] bullOwners = Locale.getStringArrayInLocale(locale, ArrayResources.bull_owners);
+        bullOwnerCB = new ComboBox(bullOwners);
+        setComponentStyle(bullOwnerCB, true);
+        bullOwnerCB.setRenderer(new MistroListCellRenderer(bullOwners));
+        bullOwnerCB.addActionListener(this);
+        this.addComponent(bullOwnerCB);
+        
+        specBullOwnerL = new Label(Locale.getStringInLocale(locale, StringResources.spec_bull_owner));
+        setLabelStyle(specBullOwnerL);
+        this.addComponent(specBullOwnerL);
+        
+        
+        specBullOwnerTF = new TextField();
+        setComponentStyle(specBullOwnerTF, false);
+        this.addComponent(specBullOwnerTF);
+        setComponentFocusable(specBullOwnerTF, false);
         
         serviceTypeSelected();
     }
@@ -235,6 +271,9 @@ public class AddServicingScreen extends Form implements Screen, ActionListener{
         if(evt.getComponent().equals(servicingTypeCB)){
             serviceTypeSelected();
         }
+        else if(evt.getComponent().equals(bullOwnerCB)){
+            bullOwnerSelected();
+        }
     }
     
     private void serviceTypeSelected(){
@@ -250,6 +289,19 @@ public class AddServicingScreen extends Form implements Screen, ActionListener{
             setComponentFocusable(strawNumberTF, false);
             setLabelFocusable(vetUsedL,false);
             setComponentFocusable(vetUsedTF, false);
+        }
+    }
+    
+    private void bullOwnerSelected(){
+        String[] bullOwnersInEN = Locale.getStringArrayInLocale(Locale.LOCALE_EN, ArrayResources.bull_owners);
+        if(bullOwnersInEN[bullOwnerCB.getSelectedIndex()].equals(Event.BULL_OWNER_OTHER_FARMER) || bullOwnersInEN[bullOwnerCB.getSelectedIndex()].equals(Event.BULL_OWNER_GROUP)){
+            //owned by a group or another farmer
+            setLabelFocusable(specBullOwnerL, true);
+            setComponentFocusable(specBullOwnerTF, true);
+        }
+        else{//owned by this farmer
+            setLabelFocusable(specBullOwnerL, false);
+            setComponentFocusable(specBullOwnerTF, false);
         }
     }
     
@@ -274,43 +326,28 @@ public class AddServicingScreen extends Form implements Screen, ActionListener{
     }
     
     private boolean validateInput(){
-        final Dialog infoDialog = new Dialog();
-        infoDialog.setDialogType(Dialog.TYPE_INFO);
-        final Command backCommand = new Command(Locale.getStringInLocale(locale, StringResources.back));
-        infoDialog.addCommand(backCommand);
-        infoDialog.addCommandListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                if(evt.getCommand().equals(backCommand)){
-                    infoDialog.dispose();
-                }
-            }
-        });
-        TextArea text = new TextArea();
-        text.setEditable(false);
-        text.setFocusable(false);
-        text.getStyle().setAlignment(CENTER);
-        infoDialog.addComponent(text);
+        final InformationDialog infoDialog = new InformationDialog(locale, false);
         
         String[] serviceTypesInEN = Locale.getStringArrayInLocale(Locale.LOCALE_EN, ArrayResources.main_service_types);
         if(serviceTypesInEN[servicingTypeCB.getSelectedIndex()].equals(Cow.SERVICE_TYPE_AI)){
             if((earTagNumberTF.getText()==null || earTagNumberTF.getText().trim().length() == 0) && (strawNumberTF.getText()==null || strawNumberTF.getText().trim().length() == 0)){
-                text.setText(Locale.getStringInLocale(locale, StringResources.enter_bull_etn_or_straw_no));
-                infoDialog.show(100, 100, 11, 11, true);
+                infoDialog.setText(Locale.getStringInLocale(locale, StringResources.enter_bull_etn_or_straw_no));
+                infoDialog.show();
                 return false;
             }
         }
         else if(serviceTypesInEN[servicingTypeCB.getSelectedIndex()].equals("Bull Servicing")){
             if(earTagNumberTF.getText()==null || earTagNumberTF.getText().trim().length() == 0){
-                text.setText(Locale.getStringInLocale(locale, StringResources.enter_ear_tag_number));
-                infoDialog.show(100, 100, 11, 11, true);
+                infoDialog.setText(Locale.getStringInLocale(locale, StringResources.enter_bull_name_or_etn));
+                infoDialog.show();
                 earTagNumberTF.requestFocus();
                 return false;
             }
         }
         if(validateDate()!=null){
-            text.setText(validateDate());
+            infoDialog.setText(validateDate());
             dateS.requestFocus();
-            infoDialog.show(100, 100, 11, 11, true);
+            infoDialog.show();
             return false;
         }
         return true;
@@ -322,7 +359,7 @@ public class AddServicingScreen extends Form implements Screen, ActionListener{
         
         long timeDiffDays = (currentTime - dateSelected.getTime())/86400000;
         
-        if(timeDiffDays > 30){
+        if(timeDiffDays > 15){
             return Locale.getStringInLocale(locale, StringResources.milk_data_too_old);
         }
         else if(timeDiffDays < 0){
@@ -333,35 +370,29 @@ public class AddServicingScreen extends Form implements Screen, ActionListener{
     }
     
     private void reactToServerResponse(String response){
-        final Dialog infoDialog = new Dialog();
-        infoDialog.setDialogType(Dialog.TYPE_INFO);
-        final Command backCommand = new Command(Locale.getStringInLocale(locale, StringResources.back));
-        infoDialog.addCommand(backCommand);
-        infoDialog.addCommandListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                if(evt.getCommand().equals(backCommand)){
-                    infoDialog.dispose();
-                }
-            }
-        });
-        Label text = new Label();
-        text.getStyle().setAlignment(CENTER);
-        infoDialog.addComponent(text);
+        final InformationDialog infoDialog = new InformationDialog(locale, false);
         
         if(response == null){
-            text.setText(Locale.getStringInLocale(locale, StringResources.problem_connecting_to_server));
-            infoDialog.show(100, 100, 11, 11, true);
+            infoDialog.setText(Locale.getStringInLocale(locale, StringResources.problem_connecting_to_server));
+            infoDialog.show();
         }
         else if(response.equals(DataHandler.ACKNOWLEDGE_OK)){
             farmer.update();
-            text.setText(Locale.getStringInLocale(locale, StringResources.information_successfully_sent_to_server));
-            infoDialog.show(100, 100, 11, 11, true);
-            FertilityScreen fertilityScreen = new FertilityScreen(midlet, locale, farmer);
-            fertilityScreen.start();
+            infoDialog.setText(Locale.getStringInLocale(locale, StringResources.information_successfully_sent_to_server));
+            infoDialog.show();
+            infoDialog.addCommandListener(new ActionListener() {
+
+                public void actionPerformed(ActionEvent ae) {
+                    if(ae.getCommand().equals(infoDialog.getBackCommand())){
+                        FertilityScreen fertilityScreen = new FertilityScreen(midlet, locale, farmer);
+                        fertilityScreen.start();
+                    }
+                }
+            });
         }
         else{
-            text.setText(Locale.getStringInLocale(locale, StringResources.problem_in_data_sent_en));
-            infoDialog.show(100, 100, 11, 11, true);
+            infoDialog.setText(Locale.getStringInLocale(locale, StringResources.problem_in_data_sent_en));
+            infoDialog.show();
         }
     }
     

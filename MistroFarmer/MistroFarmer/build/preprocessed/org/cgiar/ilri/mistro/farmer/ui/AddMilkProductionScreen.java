@@ -18,6 +18,7 @@ import java.util.Vector;
 import org.cgiar.ilri.mistro.farmer.Midlet;
 import org.cgiar.ilri.mistro.farmer.carrier.Cow;
 import org.cgiar.ilri.mistro.farmer.carrier.Farmer;
+import org.cgiar.ilri.mistro.farmer.carrier.MilkProduction;
 import org.cgiar.ilri.mistro.farmer.ui.localization.ArrayResources;
 import org.cgiar.ilri.mistro.farmer.ui.localization.Locale;
 import org.cgiar.ilri.mistro.farmer.ui.localization.StringResources;
@@ -50,10 +51,10 @@ public class AddMilkProductionScreen extends Form implements Screen{
     private TextField quantityTF;
     private Label quantityTypeL;
     private ComboBox quantityTypeCB;
-    private Label noTimesMilkedL;
+    /*private Label noTimesMilkedL;
     private TextField noTimesMilkedTF;
     private Label calfSucklingL;
-    private ComboBox calfSucklingCB;
+    private ComboBox calfSucklingCB;*/
     
     
     public AddMilkProductionScreen(Midlet midlet, int locale, Farmer farmer) {
@@ -101,10 +102,10 @@ public class AddMilkProductionScreen extends Form implements Screen{
                             String dateString = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH))+"/"+String.valueOf(calendar.get(Calendar.MONTH)+1)+"/"+String.valueOf(calendar.get(Calendar.YEAR));
                             jsonObject.put("date", dateString);
                             
-                            jsonObject.put("noMilkingTimes",noTimesMilkedTF.getText());
+                            /*jsonObject.put("noMilkingTimes",noTimesMilkedTF.getText());
                             
                             String[] yesNoInEN = Locale.getStringArrayInLocale(Locale.LOCALE_EN, ArrayResources.yes_no);
-                            jsonObject.put("calfSuckling", yesNoInEN[calfSucklingCB.getSelectedIndex()]);
+                            jsonObject.put("calfSuckling", yesNoInEN[calfSucklingCB.getSelectedIndex()]);*/
                             
                             Thread thread = new Thread(new MilkProductionHandler(jsonObject));
                             thread.run();
@@ -164,7 +165,7 @@ public class AddMilkProductionScreen extends Form implements Screen{
         quantityTypeCB.setRenderer(new MistroListCellRenderer(Locale.getStringArrayInLocale(locale, ArrayResources.quantity_types)));
         this.addComponent(quantityTypeCB);
         
-        noTimesMilkedL = new Label(Locale.getStringInLocale(locale, StringResources.no_tms_mlkd));
+        /*noTimesMilkedL = new Label(Locale.getStringInLocale(locale, StringResources.no_tms_mlkd));
         setLabelStyle(noTimesMilkedL);
         this.addComponent(noTimesMilkedL);
         
@@ -181,7 +182,7 @@ public class AddMilkProductionScreen extends Form implements Screen{
         calfSucklingCB = new ComboBox(Locale.getStringArrayInLocale(locale, ArrayResources.yes_no));
         setComponentStyle(calfSucklingCB, true);
         calfSucklingCB.setRenderer(new MistroListCellRenderer(Locale.getStringArrayInLocale(locale, ArrayResources.yes_no)));
-        this.addComponent(calfSucklingCB);
+        this.addComponent(calfSucklingCB);*/
     }
     
     private void setLabelStyle(Label label){
@@ -219,36 +220,19 @@ public class AddMilkProductionScreen extends Form implements Screen{
     }
     
     private boolean validateInput(){
-        final Dialog infoDialog = new Dialog();
-        infoDialog.setDialogType(Dialog.TYPE_INFO);
-        final Command backCommand = new Command(Locale.getStringInLocale(locale, StringResources.back));
-        infoDialog.addCommand(backCommand);
-        infoDialog.addCommandListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent evt) {
-                if(evt.getCommand().equals(backCommand)){
-                    infoDialog.dispose();
-                }
-            }
-        });
-        
-        TextArea text = new TextArea();
-        text.setEditable(false);
-        text.setFocusable(false);
-        text.getStyle().setAlignment(CENTER);
-        infoDialog.addComponent(text);
+        final InformationDialog infoDialog = new InformationDialog(locale, false);
         
         if(quantityTF.getText()==null || quantityTF.getText().trim().length() == 0){
-            text.setText(Locale.getStringInLocale(locale, StringResources.enter_quantity_of_milk_produced));
+            infoDialog.setText(Locale.getStringInLocale(locale, StringResources.enter_quantity_of_milk_produced));
             quantityTF.requestFocus();
-            infoDialog.show(100, 100, 11, 11, true);
+            infoDialog.show();
             return false;
         }
         
         if(validateDate()!=null){
-            text.setText(validateDate());
+            infoDialog.setText(validateDate());
             dateS.requestFocus();
-            infoDialog.show(100, 100, 11, 11, true);
+            infoDialog.show();
             return false;
         }
         
@@ -256,9 +240,9 @@ public class AddMilkProductionScreen extends Form implements Screen{
         String quantityType = quantityTypesInEN[quantityTypeCB.getSelectedIndex()];
         if(quantityType.equals("Litres") || quantityType.equals("KGs")){
             if(Integer.parseInt(quantityTF.getText()) > 50){
-                text.setText(Locale.getStringInLocale(locale, StringResources.milk_too_much));
+                infoDialog.setText(Locale.getStringInLocale(locale, StringResources.milk_too_much));
                 quantityTF.requestFocus();
-                infoDialog.show(100, 100, 11, 11, true);
+                infoDialog.show();
                 return false;
             }
         }
@@ -271,7 +255,7 @@ public class AddMilkProductionScreen extends Form implements Screen{
         
         long timeDiffDays = (currentTime - dateSelected.getTime())/86400000;
         
-        if(timeDiffDays > 30){
+        if(timeDiffDays > MilkProduction.MAX_MILK_PRODUCTION_DAYS){
             return Locale.getStringInLocale(locale, StringResources.milk_data_too_old);
         }
         else if(timeDiffDays < 0){
@@ -295,68 +279,33 @@ public class AddMilkProductionScreen extends Form implements Screen{
     
     private void actOnServerResponse(String response){
         if(response == null){
-            final Dialog infoDialog = new Dialog(Locale.getStringInLocale(locale, StringResources.error));
+            final InformationDialog infoDialog = new InformationDialog(Locale.getStringInLocale(locale, StringResources.error), locale, false);
             infoDialog.setDialogType(Dialog.TYPE_ERROR);
-            final Command backCommand = new Command(Locale.getStringInLocale(locale, StringResources.back));
-            infoDialog.addCommand(backCommand);
-            infoDialog.addCommandListener(new ActionListener() {
-
-                public void actionPerformed(ActionEvent evt) {
-                    if(evt.getCommand().equals(backCommand)){
-                        infoDialog.dispose();
-                    }
-                }
-            });
-
-            Label text = new Label();
-            text.getStyle().setAlignment(CENTER);
-            infoDialog.addComponent(text);
-            text.setText(Locale.getStringInLocale(locale, StringResources.problem_connecting_to_server));
-            infoDialog.show(100, 100, 11, 11, true);
+            
+            infoDialog.setText(Locale.getStringInLocale(locale, StringResources.problem_connecting_to_server));
+            infoDialog.show();
         }
         else if(response.equals(DataHandler.ACKNOWLEDGE_OK)){
             farmer.update();
-            final Dialog infoDialog = new Dialog(Locale.getStringInLocale(locale, StringResources.success));
-            infoDialog.setDialogType(Dialog.TYPE_INFO);
-            final Command backCommand = new Command(Locale.getStringInLocale(locale, StringResources.okay));
-            infoDialog.addCommand(new Command(""));//placibo command
-            infoDialog.addCommand(backCommand);
+            final InformationDialog infoDialog = new InformationDialog(Locale.getStringInLocale(locale, StringResources.success), locale, true);
+            
             infoDialog.addCommandListener(new ActionListener() {
-
                 public void actionPerformed(ActionEvent evt) {
-                    if(evt.getCommand().equals(backCommand)){
-                        infoDialog.dispose();
+                    if(evt.getCommand().equals(infoDialog.getBackCommand())){
                         MilkProductionScreen milkProductionScreen = new MilkProductionScreen(midlet, locale, farmer);
                         milkProductionScreen.start();
                     }
                 }
             });
-
-            Label text = new Label();
-            text.getStyle().setAlignment(CENTER);
-            infoDialog.addComponent(text);
-            text.setText(Locale.getStringInLocale(locale, StringResources.information_successfully_sent_to_server));
-            infoDialog.show(100, 100, 11, 11, true);
+            
+            infoDialog.setText(Locale.getStringInLocale(locale, StringResources.information_successfully_sent_to_server));
+            infoDialog.show();
         }
         else if(response.equals(DataHandler.DATA_ERROR)){
-            final Dialog infoDialog = new Dialog(Locale.getStringInLocale(locale, StringResources.error));
+            final InformationDialog infoDialog = new InformationDialog(Locale.getStringInLocale(locale, StringResources.error), locale, false);
             infoDialog.setDialogType(Dialog.TYPE_ERROR);
-            final Command backCommand = new Command(Locale.getStringInLocale(locale, StringResources.back));
-            infoDialog.addCommand(backCommand);
-            infoDialog.addCommandListener(new ActionListener() {
-
-                public void actionPerformed(ActionEvent evt) {
-                    if(evt.getCommand().equals(backCommand)){
-                        infoDialog.dispose();
-                    }
-                }
-            });
-
-            Label text = new Label();
-            text.getStyle().setAlignment(CENTER);
-            infoDialog.addComponent(text);
-            text.setText(Locale.getStringInLocale(locale, StringResources.problem_in_data_sent_en));
-            infoDialog.show(100, 100, 11, 11, true);
+            infoDialog.setText(Locale.getStringInLocale(locale, StringResources.problem_in_data_sent_en));
+            infoDialog.show();
         }
     }
     

@@ -13,6 +13,7 @@ import com.sun.lwuit.Dialog;
 import com.sun.lwuit.Form;
 import com.sun.lwuit.Label;
 import com.sun.lwuit.TextArea;
+import com.sun.lwuit.TextField;
 import com.sun.lwuit.events.ActionEvent;
 import com.sun.lwuit.events.ActionListener;
 import com.sun.lwuit.layouts.BoxLayout;
@@ -22,6 +23,7 @@ import java.util.Date;
 import java.util.Vector;
 import org.cgiar.ilri.mistro.farmer.Midlet;
 import org.cgiar.ilri.mistro.farmer.carrier.Cow;
+import org.cgiar.ilri.mistro.farmer.carrier.Event;
 import org.cgiar.ilri.mistro.farmer.carrier.Farmer;
 import org.cgiar.ilri.mistro.farmer.ui.localization.ArrayResources;
 import org.cgiar.ilri.mistro.farmer.ui.localization.Locale;
@@ -198,29 +200,12 @@ public class AddDeathEventScreen extends Form implements Screen, ActionListener{
     
     private boolean validateInput(){
         
-        final Dialog infoDialog = new Dialog();
-        infoDialog.setDialogType(Dialog.TYPE_INFO);
-        final Command backCommand = new Command(Locale.getStringInLocale(locale, StringResources.back));
-        infoDialog.addCommand(backCommand);
-        infoDialog.addCommandListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent evt) {
-                if(evt.getCommand().equals(backCommand)){
-                    infoDialog.dispose();
-                }
-            }
-        });
-        
-        TextArea text = new TextArea();
-        text.setEditable(false);
-        text.setFocusable(false);
-        text.getStyle().setAlignment(CENTER);
-        infoDialog.addComponent(text);
+        final InformationDialog infoDialog = new InformationDialog(locale, false);
         
         if(validateDate()!=null){
-            text.setText(validateDate());
+            infoDialog.setText(validateDate());
             dateS.requestFocus();
-            infoDialog.show(100, 100, 11, 11, true);
+            infoDialog.show();
             return false;
         }
         return true;
@@ -232,7 +217,7 @@ public class AddDeathEventScreen extends Form implements Screen, ActionListener{
         
         long timeDiffDays = (currentTime - dateSelected.getTime())/86400000;
         
-        if(timeDiffDays > 30){
+        if(timeDiffDays > Event.MAX_EVENT_DAYS){
             return Locale.getStringInLocale(locale, StringResources.milk_data_too_old);
         }
         else if(timeDiffDays < 0){
@@ -243,35 +228,29 @@ public class AddDeathEventScreen extends Form implements Screen, ActionListener{
     }
     
     private void reactToServerResponse(String response){
-        final Dialog infoDialog = new Dialog();
-        infoDialog.setDialogType(Dialog.TYPE_INFO);
-        final Command backCommand = new Command(Locale.getStringInLocale(locale, StringResources.back));
-        infoDialog.addCommand(backCommand);
-        infoDialog.addCommandListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                if(evt.getCommand().equals(backCommand)){
-                    infoDialog.dispose();
-                }
-            }
-        });
-        Label text = new Label();
-        text.getStyle().setAlignment(CENTER);
-        infoDialog.addComponent(text);
+        final InformationDialog infoDialog = new InformationDialog(locale, false);
         
         if(response == null){
-            text.setText(Locale.getStringInLocale(locale, StringResources.problem_connecting_to_server));
-            infoDialog.show(100, 100, 11, 11, true);
+            infoDialog.setText(Locale.getStringInLocale(locale, StringResources.problem_connecting_to_server));
+            infoDialog.show();
         }
         else if(response.equals(DataHandler.ACKNOWLEDGE_OK)){
             farmer.update();
-            text.setText(Locale.getStringInLocale(locale, StringResources.information_successfully_sent_to_server));
-            infoDialog.show(100, 100, 11, 11, true);
-            EventsScreen eventsScreen = new EventsScreen(midlet, locale, farmer);
-            eventsScreen.start();
+            infoDialog.setText(Locale.getStringInLocale(locale, StringResources.information_successfully_sent_to_server));
+            infoDialog.show();
+            infoDialog.addCommandListener(new ActionListener() {
+
+                public void actionPerformed(ActionEvent ae) {
+                    if(ae.getCommand().equals(infoDialog.getBackCommand())){
+                        EventsScreen eventsScreen = new EventsScreen(midlet, locale, farmer);
+                        eventsScreen.start();
+                    }
+                }
+            });
         }
         else{
-            text.setText(Locale.getStringInLocale(locale, StringResources.problem_in_data_sent_en));
-            infoDialog.show(100, 100, 11, 11, true);
+            infoDialog.setText(Locale.getStringInLocale(locale, StringResources.problem_in_data_sent_en));
+            infoDialog.show();
         }
     }
     

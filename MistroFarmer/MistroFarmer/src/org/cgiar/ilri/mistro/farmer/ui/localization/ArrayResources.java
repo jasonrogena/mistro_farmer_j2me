@@ -5,6 +5,11 @@ package org.cgiar.ilri.mistro.farmer.ui.localization;
  * @author jason
  */
 public class ArrayResources {
+    public static final String[][] bull_owners = {
+        {"Own bull", "Another farmer", "A group"},
+        {"", "", ""}
+    };
+    
     public static final String[][] sex_array = {
         {"Female","Male"},
         {"",""}

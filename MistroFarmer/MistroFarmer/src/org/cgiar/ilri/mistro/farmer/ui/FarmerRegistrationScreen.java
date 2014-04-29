@@ -137,32 +137,24 @@ public class FarmerRegistrationScreen extends Form implements Screen, ResponseLi
     }
     
     private boolean validateInput(){
-        final Dialog infoDialog = new Dialog();
-        infoDialog.setDialogType(Dialog.TYPE_INFO);
-        final Command backCommand = new Command(Locale.getStringInLocale(locale, StringResources.back));
-        infoDialog.addCommand(backCommand);
-        infoDialog.addCommandListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent evt) {
-                if(evt.getCommand().equals(backCommand)){
-                    infoDialog.dispose();
-                }
-            }
-        });
+        final InformationDialog infoDialog = new InformationDialog(locale, false);
         
-        Label text = new Label();
-        text.getStyle().setAlignment(CENTER);
-        infoDialog.addComponent(text);
         if(fullNameTF.getText()== null || fullNameTF.getText().trim().length()==0){
             fullNameTF.requestFocus();
-            text.setText(Locale.getStringInLocale(locale, StringResources.enter_your_name));
-            infoDialog.show(100, 100, 11, 11, true);
+            infoDialog.setText(Locale.getStringInLocale(locale, StringResources.enter_your_name));
+            infoDialog.show();
             return false;
         }
         if(mobileNoTF.getText()== null || mobileNoTF.getText().trim().length()==0){
             mobileNoTF.requestFocus();
-            text.setText(Locale.getStringInLocale(locale, StringResources.enter_your_mobile_no));
-            infoDialog.show(100, 100, 11, 11, true);
+            infoDialog.setText(Locale.getStringInLocale(locale, StringResources.enter_your_mobile_no));
+            infoDialog.show();
+            return false;
+        }
+        if(cowNumberTF.getText() == null || cowNumberTF.getText().trim().length() == 0){
+            cowNumberTF.requestFocus();
+            infoDialog.setText(Locale.getStringInLocale(locale, StringResources.enter_no_cows));
+            infoDialog.show();
             return false;
         }
         return true;
@@ -203,51 +195,27 @@ public class FarmerRegistrationScreen extends Form implements Screen, ResponseLi
 
     public void responseGotten(Object source, String message) {
         if(message.equals(DataHandler.ACKNOWLEDGE_OK)){
-            final Dialog infoDialog = new Dialog(Locale.getStringInLocale(locale, StringResources.successful_registration));
-            infoDialog.setDialogType(Dialog.TYPE_CONFIRMATION);
-            final Command placiboCommand = new Command("");
-            final Command backCommand = new Command(Locale.getStringInLocale(locale, StringResources.okay));
-            infoDialog.addCommand(placiboCommand);
-            infoDialog.addCommand(backCommand);
+            final InformationDialog infoDialog = new InformationDialog(Locale.getStringInLocale(locale, StringResources.successful_registration), locale, true);
+            
             infoDialog.addCommandListener(new ActionListener() {
 
                 public void actionPerformed(ActionEvent evt) {
                     if(evt.getCommand().equals(backCommand)){
-                        infoDialog.dispose();
                         LoginScreen loginScreen = new LoginScreen(midlet, locale);
                         loginScreen.start();
                     }
                 }
             });
-
-            TextArea text = new TextArea();
-            text.setEditable(false);
-            text.setFocusable(false);
-            text.getStyle().setAlignment(CENTER);
-            infoDialog.addComponent(text);
-            text.setText(Locale.getStringInLocale(locale, StringResources.successful_registration_instructions));
-            infoDialog.show(100, 100, 11, 11, true);
             
+            infoDialog.setText(Locale.getStringInLocale(locale, StringResources.successful_registration_instructions));
+            infoDialog.show();
         }
         else{
-            final Dialog infoDialog = new Dialog(Locale.getStringInLocale(locale, StringResources.error));
+            final InformationDialog infoDialog = new InformationDialog(Locale.getStringInLocale(locale, StringResources.error), locale, false);
             infoDialog.setDialogType(Dialog.TYPE_ERROR);
-            final Command backCommand = new Command(Locale.getStringInLocale(locale, StringResources.okay));
-            infoDialog.addCommand(backCommand);
-            infoDialog.addCommandListener(new ActionListener() {
-
-                public void actionPerformed(ActionEvent evt) {
-                    if(evt.getCommand().equals(backCommand)){
-                        infoDialog.dispose();
-                    }
-                }
-            });
-
-            Label text = new Label();
-            text.getStyle().setAlignment(CENTER);
-            infoDialog.addComponent(text);
-            text.setText(Locale.getStringInLocale(locale, StringResources.something_went_wrong_try_again));
-            infoDialog.show(100, 100, 11, 11, true);
+            
+            infoDialog.setText(Locale.getStringInLocale(locale, StringResources.something_went_wrong_try_again));
+            infoDialog.show();
         }
     }
     

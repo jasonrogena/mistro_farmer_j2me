@@ -20,8 +20,16 @@ import org.json.me.JSONObject;
 
 
 /**
- *
- * @author jason
+ * This is the Login screen for the application. It:
+ *  - Is the first screen in the application (landing screen)
+ *  - Contains part of the logic for user authentication
+ *  - Contains part of the logic for redirecting user to register
+ *    his/her mobile number if mobile number provided during logging in
+ *    is unknown
+ *  - Is the only screen where users are able to change their locale
+ * 
+ * @author Jason Rogena <j.rogena@cgiar.org>
+ * 
  */
 public class LoginScreen extends Form implements Screen, ActionListener{
     private final int locale;
@@ -37,10 +45,13 @@ public class LoginScreen extends Form implements Screen, ActionListener{
         this.midlet = midlet;
         this.locale = locale;
         
+        this.setTitle(midlet.APP_NAME + " " + midlet.APP_VERSION);
+        
         //init all layout components
         this.parentBoxLayout = new BoxLayout(BoxLayout.Y_AXIS);
         this.setLayout(parentBoxLayout);
         
+        //create logic for allowing user to exit from application
         exitCommand = new Command(Locale.getStringInLocale(locale, StringResources.exit));
         this.addCommand(exitCommand);
         this.addCommandListener(new ActionListener() {
@@ -70,6 +81,11 @@ public class LoginScreen extends Form implements Screen, ActionListener{
         this.addComponent(registerButton);
     }
 
+    /**
+     * This method should be called after the LoginScreen object has been initialized,
+     * Otherwise the screen will not show.
+     * Add logic here that you want to run just before the screen shows.
+     */
     public void start() {
         this.show();
     }
@@ -81,58 +97,78 @@ public class LoginScreen extends Form implements Screen, ActionListener{
     public void pause() {
     }
 
+    /**
+     * Abstract method from the ActionListener interface. This method is charged with listening
+     * for events in this screen. This method is called by the Event Listener abstraction on JavaME
+     * and not by code in this application.
+     * 
+     * @param event Object representing the event that has occurred
+     */
     public void actionPerformed(ActionEvent event) {
         if(event.getComponent().equals(registerButton)){
+            //Switch to the farmer registration screen
             FarmerRegistrationScreen farmerRegistrationScreen = new FarmerRegistrationScreen(midlet, locale, null);
             farmerRegistrationScreen.start();
         }
         else if(event.getComponent().equals(loginButton)){
-            final Dialog infoDialog = new Dialog(Locale.getStringInLocale(locale, StringResources.login));
-            infoDialog.setDialogType(Dialog.TYPE_INFO);
+            //Display to the user a dialog on which they can provide their mobile number
+            //TODO: fetch the mobile number automatically from the divice. Code may bahave differently in different devices. Fff JavaME
+            final Dialog loginDialog = new Dialog(Locale.getStringInLocale(locale, StringResources.login));
+            loginDialog.setDialogType(Dialog.TYPE_INFO);
             
             final Command cancelCommand = new Command(Locale.getStringInLocale(locale, StringResources.cancel));
-            infoDialog.addCommand(cancelCommand);
+            loginDialog.addCommand(cancelCommand);
             
             final Command loginCommand = new Command(Locale.getStringInLocale(locale, StringResources.login));
-            infoDialog.addCommand(loginCommand);
+            loginDialog.addCommand(loginCommand);
             
             Label mobileNumberL = new Label(Locale.getStringInLocale(locale, StringResources.mobile_number));
             mobileNumberL.getStyle().setMargin(10, 0, 10, 0);
             mobileNumberL.getSelectedStyle().setMargin(10, 0, 10, 0);
-            infoDialog.addComponent(mobileNumberL);
+            loginDialog.addComponent(mobileNumberL);
             
             final TextField mobileNumberTF = new TextField();
-            mobileNumberTF.getStyle().setMargin(5, 0, 0, 0);
-            mobileNumberTF.getSelectedStyle().setMargin(5, 0, 0, 0);
+            mobileNumberTF.getStyle().setMargin(5, 0, 10, 0);
+            mobileNumberTF.getSelectedStyle().setMargin(5, 0, 10, 0);
             mobileNumberTF.setConstraint(TextField.NUMERIC);
             mobileNumberTF.setInputModeOrder(new String[] {"123"});
-            infoDialog.addComponent(mobileNumberTF);
+            loginDialog.addComponent(mobileNumberTF);
             
-            infoDialog.addCommandListener(new ActionListener() {
+            //listen for command events
+            loginDialog.addCommandListener(new ActionListener() {
                 public void actionPerformed(ActionEvent evt) {
                     if(evt.getCommand().equals(cancelCommand)){
-                        infoDialog.dispose();
+                        //if cancel command pressed, close dialog
+                        loginDialog.dispose();
                     }
                     else if(evt.getCommand().equals(loginCommand)){
                         if(mobileNumberTF.getText()!=null || mobileNumberTF.getText().trim().length()>0){
+                            //if login command pressed and user has specified mobile number
                             String mobileNumber = mobileNumberTF.getText();
-                            Thread thread = new Thread(new LoginHandler(mobileNumber, infoDialog));
+                            Thread thread = new Thread(new LoginHandler(mobileNumber, loginDialog));
                             thread.run();
                         }
                     }
                 }
             });
             
-            infoDialog.show(100, 100, 11, 11, true);
+            loginDialog.show(100, 100, 11, 11, true);
         }
     }
     
+    /**
+     * This method is called after server responds.
+     * Be very careful, this method is not called by the main thread
+     * 
+     * @param response The response (in form of a string) from the server
+     */
     private void actOnServerResponse(String response){
         if(response == null){
             System.err.println("no response from server");
         }
         else if(response.equals(DataHandler.CODE_USER_NOT_AUTHENTICATED)) {
-            System.err.println("user not authenticated");
+            UserNotRecognizedScreen notRecognizedScreen = new UserNotRecognizedScreen(midlet, locale);
+            notRecognizedScreen.start();
         }
         else{
             try {
@@ -148,11 +184,23 @@ public class LoginScreen extends Form implements Screen, ActionListener{
         }
     }
     
+    /**
+     * This class initializes a thread for communicating with the server
+     * for purposes of authenticating the user.
+     * Make sure you call the constructor before you start the thread.
+     */
     private class LoginHandler implements Runnable{
         
         String mobileNumber;
         Dialog parentDialog;
 
+        /**
+         * Constructor for the LoginHandler class that creates a thread
+         * for communicating with the server for purposes of authentication.
+         * 
+         * @param mobileNumber Mobile number specified by user
+         * @param parentDialog Dialog that provided a means for the user to specify their number
+         */
         public LoginHandler(String mobileNumber, Dialog parentDialog) {
             this.mobileNumber = mobileNumber;
             this.parentDialog = parentDialog;
@@ -160,10 +208,15 @@ public class LoginScreen extends Form implements Screen, ActionListener{
         
 
         public void run() {
+            //1. Initialize a json object for transporting the data to the server
             JSONObject jSONObject = new JSONObject();
             try {
                 jSONObject.put("mobileNumber", mobileNumber);
+                
+                //2. Get response from the server
                 String response = DataHandler.sendDataToServer(jSONObject, DataHandler.FARMER_AUTHENTICATION_URL);
+                
+                //3. Close the dialog where user specified his/her phone number
                 parentDialog.dispose();
                 actOnServerResponse(response);
             } 

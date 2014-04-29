@@ -4,12 +4,16 @@ import org.json.me.JSONException;
 import org.json.me.JSONObject;
 
 /**
- * Created by jason on 8/5/13.
+ * This is a carrier Class for dam information.
+ * This class is a sub class of the Cow class.
+ * 
+ * @author Jason Rogena <j.rogena@cgiar.org>
  */
 public class Dam extends Cow {
     private String embryoNumber;
 
     public Dam() {
+        //set super to false since this is a dam
         super(false);
         setSex(SEX_FEMALE);
         embryoNumber="";
@@ -23,11 +27,16 @@ public class Dam extends Cow {
         return embryoNumber;
     }
     
-   
+    /**
+     * This method returns data stored in this object as a json object
+     * @return 
+     */
     public JSONObject getJsonObject() {
+        // 1. Get data in form of json object from parent object (Cow)
         JSONObject jsonObject=super.getJsonObject();
         try
         {
+            // 2. Append data stored in this object to the json object obtained from parent object
             jsonObject.put("type","dam");
             jsonObject.put("embryoNumber",((embryoNumber==null) ? "":embryoNumber));
         }

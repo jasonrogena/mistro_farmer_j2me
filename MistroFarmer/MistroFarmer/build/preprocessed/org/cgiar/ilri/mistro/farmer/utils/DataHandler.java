@@ -26,8 +26,9 @@ public class DataHandler {
     private static final String TAG="DataHandler";
     private static final int HTTP_POST_TIMEOUT =20000;
     private static final int HTTP_RESPONSE_TIMEOUT =20000;
-    //private static final String BASE_URL="http://127.0.0.1/~jason/MistroFarmerProject/web";
-    private static final String BASE_URL="http://hpc.ilri.cgiar.org/~jrogena/mistro_web";
+    private static final String BASE_URL="http://127.0.0.1/~jason/ngombe_planner/WebServer";
+    //private static final String BASE_URL="http://hpc.ilri.cgiar.org/~jrogena/mistro_web";
+    //private static final String BASE_URL="http://azizi.ilri.cgiar.org/ngombe_planner";
     public static final String FARMER_REGISTRATION_URL="/php/farmer/registration.php";
     public static final String FARMER_AUTHENTICATION_URL="/php/farmer/authentication.php";
     public static final String FARMER_SIM_CARD_REGISTRATION_URL="/php/farmer/sim_card_registration.php";
