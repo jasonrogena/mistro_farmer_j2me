@@ -4,12 +4,14 @@ import com.sun.lwuit.Button;
 import com.sun.lwuit.Command;
 import com.sun.lwuit.Component;
 import com.sun.lwuit.Dialog;
+import com.sun.lwuit.Display;
 import com.sun.lwuit.Form;
 import com.sun.lwuit.Label;
 import com.sun.lwuit.TextField;
 import com.sun.lwuit.events.ActionEvent;
 import com.sun.lwuit.events.ActionListener;
 import com.sun.lwuit.layouts.BoxLayout;
+import javax.microedition.lcdui.Displayable;
 import org.cgiar.ilri.mistro.farmer.Midlet;
 import org.cgiar.ilri.mistro.farmer.carrier.Farmer;
 import org.cgiar.ilri.mistro.farmer.ui.localization.Locale;
@@ -39,6 +41,7 @@ public class LoginScreen extends Form implements Screen, ActionListener{
     private Button registerButton;
     private Command exitCommand;
     private final Midlet midlet;
+    private int displayHeight;
     
     public LoginScreen(Midlet midlet,int locale) {
         super();
@@ -46,6 +49,9 @@ public class LoginScreen extends Form implements Screen, ActionListener{
         this.locale = locale;
         
         this.setTitle(midlet.APP_NAME + " " + midlet.APP_VERSION);
+        
+        //get screen Height
+        displayHeight = Screen.Util.getScreenHeight(this);
         
         //init all layout components
         this.parentBoxLayout = new BoxLayout(BoxLayout.Y_AXIS);
@@ -64,9 +70,9 @@ public class LoginScreen extends Form implements Screen, ActionListener{
         
         loginButton = new Button(Locale.getStringInLocale(locale, StringResources.login));
         loginButton.getStyle().setAlignment(Component.CENTER);
-        loginButton.getStyle().setMargin(100, 10, 0, 0);
+        loginButton.getStyle().setMargin((int)(displayHeight*0.1), 10, 0, 0);
         loginButton.getSelectedStyle().setAlignment(Component.CENTER);
-        loginButton.getSelectedStyle().setMargin(100, 10, 0, 0);
+        loginButton.getSelectedStyle().setMargin((int)(displayHeight*0.1), 10, 0, 0);
         loginButton.getSelectedStyle().setBgColor(0x2ecc71);
         loginButton.addActionListener(this);
         this.addComponent(loginButton);
@@ -115,6 +121,7 @@ public class LoginScreen extends Form implements Screen, ActionListener{
             //TODO: fetch the mobile number automatically from the divice. Code may bahave differently in different devices. Fff JavaME
             final Dialog loginDialog = new Dialog(Locale.getStringInLocale(locale, StringResources.login));
             loginDialog.setDialogType(Dialog.TYPE_INFO);
+            loginDialog.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
             
             final Command cancelCommand = new Command(Locale.getStringInLocale(locale, StringResources.cancel));
             loginDialog.addCommand(cancelCommand);
@@ -128,8 +135,8 @@ public class LoginScreen extends Form implements Screen, ActionListener{
             loginDialog.addComponent(mobileNumberL);
             
             final TextField mobileNumberTF = new TextField();
-            mobileNumberTF.getStyle().setMargin(5, 0, 10, 0);
-            mobileNumberTF.getSelectedStyle().setMargin(5, 0, 10, 0);
+            mobileNumberTF.getStyle().setMargin(5, 0, 0, 0);
+            mobileNumberTF.getSelectedStyle().setMargin(5, 0, 0, 0);
             mobileNumberTF.setConstraint(TextField.NUMERIC);
             mobileNumberTF.setInputModeOrder(new String[] {"123"});
             loginDialog.addComponent(mobileNumberTF);
@@ -152,7 +159,7 @@ public class LoginScreen extends Form implements Screen, ActionListener{
                 }
             });
             
-            loginDialog.show(100, 100, 11, 11, true);
+            loginDialog.show((int)(displayHeight*0.1), (int)(displayHeight*0.1), 11, 11, true);
         }
     }
     

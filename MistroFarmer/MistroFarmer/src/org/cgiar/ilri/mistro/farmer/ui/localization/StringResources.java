@@ -537,4 +537,8 @@ public class StringResources {
         "Please enter the number of cows",
         ""
     };
+    public static final String[] click_to_set_date = {
+        "Click to set the date",
+        ""
+    };
 }

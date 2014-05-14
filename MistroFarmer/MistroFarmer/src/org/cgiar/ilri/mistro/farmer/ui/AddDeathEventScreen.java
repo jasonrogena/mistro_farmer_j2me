@@ -6,6 +6,7 @@
 
 package org.cgiar.ilri.mistro.farmer.ui;
 
+import com.sun.lwuit.Button;
 import com.sun.lwuit.ComboBox;
 import com.sun.lwuit.Command;
 import com.sun.lwuit.Component;
@@ -36,7 +37,7 @@ import org.json.me.JSONObject;
  *
  * @author jason
  */
-public class AddDeathEventScreen extends Form implements Screen, ActionListener{
+public class AddDeathEventScreen extends Form implements Screen, ActionListener, DateDialog.OnDateEnteredListener{
 
     private final Midlet midlet;
     private final int locale;
@@ -52,6 +53,8 @@ public class AddDeathEventScreen extends Form implements Screen, ActionListener{
     private ComboBox cowCB;
     private Label dateL;
     private Spinner dateS;
+    private Button dateB;
+    private DateDialog dateDialog = null ;
     private Label causeOfDeathL;
     private ComboBox causeOfDeathCB;
     private Label remarksL;
@@ -124,10 +127,14 @@ public class AddDeathEventScreen extends Form implements Screen, ActionListener{
         setLabelStyle(dateL);
         this.addComponent(dateL);
         
-        dateS = Spinner.createDate(System.currentTimeMillis() - (31536000730l*50), System.currentTimeMillis(), System.currentTimeMillis(), '/', Spinner.DATE_FORMAT_DD_MM_YYYY);
-        setComponentStyle(dateS, true);
-        dateS.getSelectedStyle().setFgColor(0x2ecc71);
-        this.addComponent(dateS);
+        dateS = Spinner.createDate(System.currentTimeMillis() - (86400000l*15), System.currentTimeMillis(), System.currentTimeMillis(), '/', Spinner.DATE_FORMAT_DD_MM_YYYY);
+        //setComponentStyle(dateS, true);
+        //dateS.getSelectedStyle().setFgColor(0x2ecc71);
+        //this.addComponent(dateS);
+        dateB = new Button(Locale.getStringInLocale(locale, StringResources.click_to_set_date));
+        setComponentStyle(dateB, true);
+        dateB.addActionListener(this);
+        this.addComponent(dateB);
         
         causeOfDeathL = new Label(Locale.getStringInLocale(locale, StringResources.cause_of_death));
         setLabelStyle(causeOfDeathL);
@@ -174,7 +181,14 @@ public class AddDeathEventScreen extends Form implements Screen, ActionListener{
     }
 
     public void actionPerformed(ActionEvent evt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(evt.getComponent().equals(dateB)){
+            if(dateDialog == null){
+                dateDialog = new DateDialog(locale, dateS, this);
+                dateDialog.setText(Locale.getStringInLocale(locale, StringResources.enter_date));
+            }
+            
+            dateDialog.show();
+        }
     }
 
     private String[] getValidCows(){
@@ -252,6 +266,10 @@ public class AddDeathEventScreen extends Form implements Screen, ActionListener{
             infoDialog.setText(Locale.getStringInLocale(locale, StringResources.problem_in_data_sent_en));
             infoDialog.show();
         }
+    }
+
+    public void dateSelected(Spinner spinner, Date date) {
+        dateB.setText(DateDialog.dateToString((Date)dateS.getValue()));
     }
     
     private class EventHandler implements Runnable{

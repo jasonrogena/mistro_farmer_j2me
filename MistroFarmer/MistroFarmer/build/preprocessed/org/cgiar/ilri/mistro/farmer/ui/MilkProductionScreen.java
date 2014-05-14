@@ -28,6 +28,8 @@ public class MilkProductionScreen extends Form implements Screen, ActionListener
     private Button addMilkProductionB;
     private Button pastMilkProdutionB;
     
+    private final float MARGIN_TOP = 0.1f;
+    
     public MilkProductionScreen(Midlet midlet, int locale, Farmer farmer) {
         super(Locale.getStringInLocale(locale, StringResources.milk_production));
         this.midlet = midlet;
@@ -50,12 +52,14 @@ public class MilkProductionScreen extends Form implements Screen, ActionListener
             }
         });
         
+        int displayHeight = Screen.Util.getScreenHeight(this);
+        
         parentBoxLayout = new BoxLayout(BoxLayout.Y_AXIS);
         this.setLayout(parentBoxLayout);
         
         addMilkProductionB = new Button(Locale.getStringInLocale(locale, StringResources.add_production));
-        addMilkProductionB.getStyle().setMargin(100, 10, 0, 0);
-        addMilkProductionB.getSelectedStyle().setMargin(100, 10, 0, 0);
+        addMilkProductionB.getStyle().setMargin((int)(displayHeight * MARGIN_TOP), 10, 0, 0);
+        addMilkProductionB.getSelectedStyle().setMargin((int)(displayHeight * MARGIN_TOP), 10, 0, 0);
         setButtonStyle(addMilkProductionB);
         addMilkProductionB.addActionListener(this);
         this.addComponent(addMilkProductionB);

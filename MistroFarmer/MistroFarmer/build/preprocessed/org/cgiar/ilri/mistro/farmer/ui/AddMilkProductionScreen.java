@@ -1,5 +1,6 @@
 package org.cgiar.ilri.mistro.farmer.ui;
 
+import com.sun.lwuit.Button;
 import com.sun.lwuit.ComboBox;
 import com.sun.lwuit.Command;
 import com.sun.lwuit.Component;
@@ -30,7 +31,7 @@ import org.json.me.JSONObject;
  *
  * @author jason
  */
-public class AddMilkProductionScreen extends Form implements Screen{
+public class AddMilkProductionScreen extends Form implements Screen, ActionListener, DateDialog.OnDateEnteredListener{
     
     private final Midlet midlet;
     private final int locale;
@@ -45,12 +46,16 @@ public class AddMilkProductionScreen extends Form implements Screen{
     private ComboBox cowCB;
     private Label dateL;
     private Spinner dateS;
+    DateDialog dateDialog = null;
+    private Button dateB;
     private Label timeL;
     private ComboBox timeCB;
     private Label quantityL;
     private TextField quantityTF;
     private Label quantityTypeL;
     private ComboBox quantityTypeCB;
+    
+    //private Date date;
     /*private Label noTimesMilkedL;
     private TextField noTimesMilkedTF;
     private Label calfSucklingL;
@@ -132,10 +137,16 @@ public class AddMilkProductionScreen extends Form implements Screen{
         setLabelStyle(dateL);
         this.addComponent(dateL);
         
-        dateS = Spinner.createDate(System.currentTimeMillis() - (31536000730l*50), System.currentTimeMillis(), System.currentTimeMillis(), '/', Spinner.DATE_FORMAT_DD_MM_YYYY);
-        setComponentStyle(dateS, true);
-        dateS.getSelectedStyle().setFgColor(0x2ecc71);
-        this.addComponent(dateS);
+        dateB = new Button(Locale.getStringInLocale(locale, StringResources.click_to_set_date));
+        setComponentStyle(dateB, true);
+        dateB.getSelectedStyle().setBgColor(0x2ecc71);
+        dateB.addActionListener(this);
+        this.addComponent(dateB);
+        
+        
+        dateS = Spinner.createDate(System.currentTimeMillis() - (86400000l*15), System.currentTimeMillis(), System.currentTimeMillis(), '/', Spinner.DATE_FORMAT_DD_MM_YYYY);
+        //setComponentStyle(dateS, true);
+        //this.addComponent(dateS);
         
         timeL = new Label(Locale.getStringInLocale(locale, StringResources.time));
         setLabelStyle(timeL);
@@ -231,7 +242,7 @@ public class AddMilkProductionScreen extends Form implements Screen{
         
         if(validateDate()!=null){
             infoDialog.setText(validateDate());
-            dateS.requestFocus();
+            dateB.requestFocus();
             infoDialog.show();
             return false;
         }
@@ -306,6 +317,23 @@ public class AddMilkProductionScreen extends Form implements Screen{
             infoDialog.setDialogType(Dialog.TYPE_ERROR);
             infoDialog.setText(Locale.getStringInLocale(locale, StringResources.problem_in_data_sent_en));
             infoDialog.show();
+        }
+    }
+
+    public void actionPerformed(ActionEvent ae) {
+        if(ae.getComponent().equals(dateB)){
+            if(dateDialog == null){
+                dateDialog = new DateDialog(locale, dateS, this);
+                dateDialog.setText(Locale.getStringInLocale(locale, StringResources.enter_date));
+            }
+            
+            dateDialog.show();
+        }
+    }
+
+    public void dateSelected(Spinner spinner, Date date) {
+        if(spinner.equals(dateS)){
+            dateB.setText(DateDialog.dateToString((Date)dateS.getValue()));
         }
     }
     

@@ -34,6 +34,8 @@ public class MainMenuScreen extends Form implements Screen, ActionListener{
     private Button eventsB;
     private BoxLayout parentBoxLayout;
     
+    private final float MARGIN_TOP = 0.1f;
+    
     public MainMenuScreen(Midlet midlet, int locale, Farmer farmer) {
         super(Locale.getStringInLocale(locale, StringResources.main_menu)+" ("+farmer.getFullName()+")");
         
@@ -56,9 +58,11 @@ public class MainMenuScreen extends Form implements Screen, ActionListener{
             }
         });
         
+        int displayHeight = Screen.Util.getScreenHeight(this);
+        
         milkProductionB = new Button(Locale.getStringInLocale(locale, StringResources.milk_production));
-        milkProductionB.getStyle().setMargin(80, 10, 0, 0);
-        milkProductionB.getSelectedStyle().setMargin(80, 10, 0, 0);
+        milkProductionB.getStyle().setMargin((int)(displayHeight* MARGIN_TOP), 10, 0, 0);
+        milkProductionB.getSelectedStyle().setMargin((int)(displayHeight* MARGIN_TOP), 10, 0, 0);
         setButtonStyle(milkProductionB);
         milkProductionB.addActionListener(this);
         this.addComponent(milkProductionB);

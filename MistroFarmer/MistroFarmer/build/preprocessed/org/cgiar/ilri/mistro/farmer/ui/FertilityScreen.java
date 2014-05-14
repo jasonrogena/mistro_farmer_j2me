@@ -37,6 +37,8 @@ public class FertilityScreen extends Form implements Screen, ActionListener{
     private Button servicingB;
     private Button calvingB;
     
+    private final float MARGIN_TOP = 0.1f;
+    
     public FertilityScreen(Midlet midlet, int locale, Farmer farmer) {
         super(Locale.getStringInLocale(locale, StringResources.fertility));
         
@@ -60,9 +62,11 @@ public class FertilityScreen extends Form implements Screen, ActionListener{
             }
         });
         
+        int displayHeight = Screen.Util.getScreenHeight(this);
+        
         servicingB = new Button(Locale.getStringInLocale(locale, StringResources.servicing));
-        servicingB.getStyle().setMargin(100, 10, 0, 0);
-        servicingB.getSelectedStyle().setMargin(100, 10, 0, 0);
+        servicingB.getStyle().setMargin((int)(displayHeight * MARGIN_TOP), 10, 0, 0);
+        servicingB.getSelectedStyle().setMargin((int)(displayHeight * MARGIN_TOP), 10, 0, 0);
         setButtonStyle(servicingB);
         servicingB.addActionListener(this);
         this.addComponent(servicingB);

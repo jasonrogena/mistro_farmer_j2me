@@ -38,6 +38,11 @@ public class EventsScreen extends Form implements Screen, ActionListener{
     private Button addEventButton;
     private Button pastEventsButton;
     
+    private final float MARGIN_TOP = 0.1f;
+    private final float DIALOG_MARGIN_TOP = 0.1f;
+    private final float DIALOG_MARGIN_BOTTOM = 0.1f;
+    private final float DIALOG_MARGIN_HORIZONTAL = 0.05f;
+    
     public EventsScreen(Midlet midlet, int locale, Farmer farmer) {
         super(Locale.getStringInLocale(locale, StringResources.other_events));
         
@@ -61,10 +66,11 @@ public class EventsScreen extends Form implements Screen, ActionListener{
             }
         });
         
+        int displayHeight = Screen.Util.getScreenHeight(this);
         
         addEventButton = new Button(Locale.getStringInLocale(locale, StringResources.add_an_event));
-        addEventButton.getStyle().setMargin(100, 10, 0, 0);
-        addEventButton.getSelectedStyle().setMargin(100, 10, 0, 0);
+        addEventButton.getStyle().setMargin((int)(displayHeight * MARGIN_TOP), 10, 0, 0);
+        addEventButton.getSelectedStyle().setMargin((int)(displayHeight * MARGIN_TOP), 10, 0, 0);
         setButtonStyle(addEventButton);
         addEventButton.addActionListener(this);
         this.addComponent(addEventButton);
@@ -143,7 +149,10 @@ public class EventsScreen extends Form implements Screen, ActionListener{
                 }
             });
             
-            infoDialog.show(100, 100, 11, 11, true);
+            int displayHeight = Screen.Util.getScreenHeight(this);
+            int displayWidth = Screen.Util.getScreenWidth(this);
+            
+            infoDialog.show((int)(displayHeight * DIALOG_MARGIN_TOP), (int)(displayHeight * DIALOG_MARGIN_BOTTOM), (int)(displayWidth * DIALOG_MARGIN_HORIZONTAL), (int)(displayWidth * DIALOG_MARGIN_HORIZONTAL), true);
         }
         else if(evt.getComponent().equals(pastEventsButton)){
             PastEventsScreen pastEventsScreen = new PastEventsScreen(midlet, locale, farmer);

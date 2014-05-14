@@ -1,5 +1,6 @@
 package org.cgiar.ilri.mistro.farmer.ui;
 
+import com.sun.lwuit.Button;
 import com.sun.lwuit.ComboBox;
 import com.sun.lwuit.Command;
 import com.sun.lwuit.Component;
@@ -30,7 +31,7 @@ import org.cgiar.ilri.mistro.farmer.utils.ResponseListener;
  *
  * @author jason
  */
-public class CowRegistrationScreen extends Form implements Screen, ActionListener, ResponseListener{
+public class CowRegistrationScreen extends Form implements Screen, ActionListener, ResponseListener, DateDialog.OnDateEnteredListener{
 
     private final Midlet midlet;
     private final int locale;
@@ -56,6 +57,8 @@ public class CowRegistrationScreen extends Form implements Screen, ActionListene
     private ComboBox ageTypeCB;
     private Label dateOfBirthL;
     private Spinner dateOfBirthS;
+    private Button dateOfBirthB;
+    private DateDialog dateDialog;
     private Label breedL;
     private ComboBox breedCB;
     private MultiselectRenderer breedMultiselectRenderer;
@@ -200,10 +203,14 @@ public class CowRegistrationScreen extends Form implements Screen, ActionListene
         setLabelStyle(dateOfBirthL);
         this.addComponent(dateOfBirthL);
         
-        dateOfBirthS = Spinner.createDate(System.currentTimeMillis() - (31536000730l*50), System.currentTimeMillis(), System.currentTimeMillis(), '/', Spinner.DATE_FORMAT_DD_MM_YYYY);
-        setComponentStyle(dateOfBirthS, true);
-        dateOfBirthS.getSelectedStyle().setFgColor(0x2ecc71);
-        this.addComponent(dateOfBirthS);
+        dateOfBirthS = Spinner.createDate(System.currentTimeMillis() - (31536000730l*20), System.currentTimeMillis(), System.currentTimeMillis(), '/', Spinner.DATE_FORMAT_DD_MM_YYYY);
+        //setComponentStyle(dateOfBirthS, true);
+        //dateOfBirthS.getSelectedStyle().setFgColor(0x2ecc71);
+        //this.addComponent(dateOfBirthS);
+        dateOfBirthB = new Button(Locale.getStringInLocale(locale, StringResources.click_to_set_date));
+        setComponentStyle(dateOfBirthB, true);
+        dateOfBirthB.addActionListener(this);
+        this.addComponent(dateOfBirthB);
         
         breedL = new Label(Locale.getStringInLocale(locale, StringResources.breed));
         setLabelStyle(breedL);
@@ -716,6 +723,14 @@ public class CowRegistrationScreen extends Form implements Screen, ActionListene
         else if(evt.getComponent().equals(deformityCB)){
             deformitySelected();
         }
+        if(evt.getComponent().equals(dateOfBirthB)){
+            if(dateDialog == null){
+                dateDialog = new DateDialog(locale, dateOfBirthS, this);
+                dateDialog.setText(Locale.getStringInLocale(locale, StringResources.enter_date));
+            }
+            
+            dateDialog.show();
+        }
     }
     
     private void deformitySelected(){
@@ -868,6 +883,10 @@ public class CowRegistrationScreen extends Form implements Screen, ActionListene
             }
         }
         
+    }
+
+    public void dateSelected(Spinner spinner, Date date) {
+        dateOfBirthB.setText(dateDialog.dateToString((Date)dateOfBirthS.getValue()));
     }
     
 }

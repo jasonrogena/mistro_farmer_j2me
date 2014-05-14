@@ -6,6 +6,7 @@
 
 package org.cgiar.ilri.mistro.farmer.ui;
 
+import com.sun.lwuit.Button;
 import com.sun.lwuit.ComboBox;
 import com.sun.lwuit.Command;
 import com.sun.lwuit.Component;
@@ -38,7 +39,7 @@ import org.json.me.JSONObject;
  * 
  * @author Jason Rogena <j.rogena@cgiar.org>
  */
-public class AddCalvingScreen extends Form implements Screen{
+public class AddCalvingScreen extends Form implements Screen, DateDialog.OnDateEnteredListener, ActionListener{
 
     private final Midlet midlet;
     private final Farmer farmer;
@@ -54,6 +55,8 @@ public class AddCalvingScreen extends Form implements Screen{
     private ComboBox cowCB;
     private Label dateL;
     private Spinner dateS;
+    private Button dateB;
+    private DateDialog dateDialog = null;
     private Label typeL;
     private ComboBox typeCB;
     /*private Label birthsL;
@@ -156,10 +159,14 @@ public class AddCalvingScreen extends Form implements Screen{
         setLabelStyle(dateL);
         this.addComponent(dateL);
         
-        dateS = Spinner.createDate(System.currentTimeMillis() - (31536000730l*50), System.currentTimeMillis(), System.currentTimeMillis(), '/', Spinner.DATE_FORMAT_DD_MM_YYYY);
-        setComponentStyle(dateS, true);
-        dateS.getSelectedStyle().setFgColor(0x2ecc71);
-        this.addComponent(dateS);
+        dateS = Spinner.createDate(System.currentTimeMillis() - (86400000l*15), System.currentTimeMillis(), System.currentTimeMillis(), '/', Spinner.DATE_FORMAT_DD_MM_YYYY);
+        //setComponentStyle(dateS, true);
+        //dateS.getSelectedStyle().setFgColor(0x2ecc71);
+        //this.addComponent(dateS);
+        dateB = new Button(Locale.getStringInLocale(locale, StringResources.click_to_set_date));
+        setComponentStyle(dateB, true);
+        dateB.addActionListener(this);
+        this.addComponent(dateB);
         
         typeL = new Label(Locale.getStringInLocale(locale, StringResources.type_of_birth));
         setLabelStyle(typeL);
@@ -305,6 +312,21 @@ public class AddCalvingScreen extends Form implements Screen{
            infoDialog.setText(Locale.getStringInLocale(locale, StringResources.something_went_wrong_try_again));
            infoDialog.show();
        }
+    }
+
+    public void dateSelected(Spinner spinner, Date date) {
+        dateB.setText(DateDialog.dateToString((Date)dateS.getValue()));
+    }
+
+    public void actionPerformed(ActionEvent ae) {
+        if(ae.getComponent().equals(dateB)){
+            if(dateDialog == null){
+                dateDialog = new DateDialog(locale, dateS, this);
+                dateDialog.setText(Locale.getStringInLocale(locale, StringResources.enter_date));
+            }
+            
+            dateDialog.show();
+        }
     }
     
     /**
