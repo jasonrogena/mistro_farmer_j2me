@@ -1,6 +1,7 @@
 package org.cgiar.ilri.mistro.farmer.carrier;
 
 import org.cgiar.ilri.mistro.farmer.ui.FarmerRegistrationScreen;
+import org.cgiar.ilri.mistro.farmer.ui.localization.Locale;
 import org.cgiar.ilri.mistro.farmer.utils.DataHandler;
 import org.cgiar.ilri.mistro.farmer.utils.ResponseListener;
 import org.json.me.JSONArray;
@@ -23,6 +24,8 @@ public class Farmer {
     private String latitude;
     private String simCardSN;
     private String mode;
+    private String preferreLocale;
+    
     private EventConstraint[] eventConstraints;
 
     /**
@@ -39,6 +42,7 @@ public class Farmer {
         latitude="";
         simCardSN ="";
         mode = "";
+        preferreLocale = "";
     }
     
     /**
@@ -56,6 +60,7 @@ public class Farmer {
             longitude=farmerJSONObject.getString("gps_longitude");
             latitude=farmerJSONObject.getString("gps_latitude");
             simCardSN=farmerJSONObject.getString("sim_card_sn");
+            preferreLocale = farmerJSONObject.getString("pref_locale");
             
             JSONArray cowsJSONArray = farmerJSONObject.getJSONArray("cows");
             cows = new Cow[cowsJSONArray.length()];
@@ -98,6 +103,14 @@ public class Farmer {
 
     public void setMobileNumber(String mobileNumber) {
         this.mobileNumber = mobileNumber;
+    }
+    
+    public void setPreferredLanguage(String language){
+        this.preferreLocale = Locale.getLocaleString(language);
+    }
+    
+    public String getPreferredLanguage(){
+        return Locale.getLanguage(preferreLocale);
     }
 
     /**
@@ -267,6 +280,7 @@ public class Farmer {
             jsonObject.put("latitude",((latitude==null) ? "":latitude));
             jsonObject.put("simCardSN",((simCardSN ==null) ? "": simCardSN));
             jsonObject.put("mode",((mode ==null) ? "": mode));
+            jsonObject.put("preferredLocale", preferreLocale);
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -317,6 +331,7 @@ public class Farmer {
             longitude=farmerJSONObject.getString("gps_longitude");
             latitude=farmerJSONObject.getString("gps_latitude");
             simCardSN=farmerJSONObject.getString("sim_card_sn");
+            preferreLocale = farmerJSONObject.getString("pref_locale");
             
             JSONArray cowsJSONArray = farmerJSONObject.getJSONArray("cows");
             cows = new Cow[cowsJSONArray.length()];

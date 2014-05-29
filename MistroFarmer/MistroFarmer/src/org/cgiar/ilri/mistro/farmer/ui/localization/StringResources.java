@@ -551,4 +551,9 @@ public class StringResources {
         "Selected cow is too young",
         ""
     };
+    
+    public static final String[] preferred_language = {
+        "Preferred Language",
+        ""
+    };
 }

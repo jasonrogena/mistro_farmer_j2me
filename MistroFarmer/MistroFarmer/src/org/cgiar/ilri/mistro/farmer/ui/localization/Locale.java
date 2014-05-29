@@ -32,4 +32,35 @@ public class Locale {
             return null;
         }
     }
+    
+    public static String[] getAllLanguages(){
+        String[] languages = new String[2];
+        languages[0] = "English";
+        languages[1] = "Swahili";
+        return languages;
+    }
+    
+    public static String getLocaleString(String language){
+        if(language.equals("English")){
+            return "en";
+        }
+        else if(language.equals("Swahili")){
+            return "sw";
+        }
+        else{
+            return "en";//default locale
+        }
+    }
+    
+    public static String getLanguage(String locale){
+        if(locale.equals("en")){
+            return "English";
+        }
+        else if(locale.equals("sw")){
+            return "Swahili";
+        }
+        else{
+            return "English";
+        }
+    }
 }

@@ -46,11 +46,14 @@ public class FarmerRegistrationScreen extends Form implements Screen, ResponseLi
     private Label mobileNoL;
     private ComboBox ePersonnelCB;
     private Label ePersonnelL;
+    private Label preferredLanguageL;
+    private ComboBox preferredLanguageCB;
     private Label cowNumberL;
     private TextField cowNumberTF;
     private Farmer farmer;
     
     private String[] vetNames;
+    private String[] languages;
 
     public FarmerRegistrationScreen(Midlet midlet, int locale, Farmer farmer) {
         super(Locale.getStringInLocale(locale, StringResources.register));
@@ -131,6 +134,19 @@ public class FarmerRegistrationScreen extends Form implements Screen, ResponseLi
         ePersonnelCB.setRenderer(new MistroListCellRenderer(vetNames));
         this.addComponent(ePersonnelCB);
         
+        preferredLanguageL = new Label(Locale.getStringInLocale(locale, StringResources.preferred_language));
+        preferredLanguageL.getStyle().setMargin(10, 0, 10, 0);
+        preferredLanguageL.getSelectedStyle().setMargin(10, 0, 10, 0);
+        this.addComponent(preferredLanguageL);
+        
+        languages = Locale.getAllLanguages();
+        preferredLanguageCB = new ComboBox(languages);
+        preferredLanguageCB.getStyle().setMargin(5, 0, 0, 0);
+        preferredLanguageCB.getSelectedStyle().setMargin(5, 0, 0, 0);
+        preferredLanguageCB.getSelectedStyle().setBgColor(0x2ecc71);
+        preferredLanguageCB.setRenderer(new MistroListCellRenderer(languages));
+        this.addComponent(preferredLanguageCB);
+        
         cowNumberL = new Label(Locale.getStringInLocale(locale, StringResources.number_of_cows));
         cowNumberL.getStyle().setMargin(10, 0, 10, 0);
         cowNumberL.getSelectedStyle().setMargin(10, 0, 10, 0);
@@ -178,6 +194,7 @@ public class FarmerRegistrationScreen extends Form implements Screen, ResponseLi
         farmer.setFullName(fullNameTF.getText());
         farmer.setMobileNumber(mobileNoTF.getText());
         farmer.setExtensionPersonnel(vetNames[ePersonnelCB.getSelectedIndex()]);
+        farmer.setPreferredLanguage(languages[preferredLanguageCB.getSelectedIndex()]);
         if(cowNumberTF.getText()!=null && cowNumberTF.getText().trim().length() > 0){
             farmer.setCowNumber(Integer.parseInt(cowNumberTF.getText().trim()));
         }
@@ -203,6 +220,13 @@ public class FarmerRegistrationScreen extends Form implements Screen, ResponseLi
                 tmp[tmp.length - 1] = selectedP;
                 vetNames = tmp;
                 epIndex = tmp.length - 1;
+            }
+            
+            String prefLang = this.farmer.getPreferredLanguage();
+            for(int i = 0; i < languages.length; i++){
+                if(languages[i].equals(prefLang)){
+                    preferredLanguageCB.setSelectedIndex(i);
+                }
             }
             
             ePersonnelCB.setSelectedIndex(epIndex);
