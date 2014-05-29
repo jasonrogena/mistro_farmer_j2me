@@ -209,7 +209,7 @@ public class AddCalvingScreen extends Form implements Screen, DateDialog.OnDateE
         validCows = new Vector(allCows.length);
         if(allCows!=null){
             for(int i = 0; i < allCows.length; i++){
-                if(allCows[i].getSex().equals(Cow.SEX_FEMALE) && allCows[i].getEarTagNumber()!=null && allCows[i].getEarTagNumber().trim().length()>0){
+                if(allCows[i].getSex().equals(Cow.SEX_FEMALE)){// && allCows[i].getEarTagNumber()!=null && allCows[i].getEarTagNumber().trim().length()>0){
                     validCows.addElement(allCows[i]);
                 }
             }

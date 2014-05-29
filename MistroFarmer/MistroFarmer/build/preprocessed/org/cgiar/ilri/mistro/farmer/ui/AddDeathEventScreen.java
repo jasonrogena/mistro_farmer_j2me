@@ -195,9 +195,9 @@ public class AddDeathEventScreen extends Form implements Screen, ActionListener,
         Cow[] allCows = farmer.getCows();
         validCows = new Vector(allCows.length);
         for(int i = 0; i < allCows.length; i++){
-            if(allCows[i].getEarTagNumber()!=null && allCows[i].getEarTagNumber().trim().length()>0){
-                validCows.addElement(allCows[i]);
-            }
+            //if(allCows[i].getEarTagNumber()!=null && allCows[i].getEarTagNumber().trim().length()>0){
+            validCows.addElement(allCows[i]);
+            //}
         }
         
         String[] cowNames = new String[validCows.size()];

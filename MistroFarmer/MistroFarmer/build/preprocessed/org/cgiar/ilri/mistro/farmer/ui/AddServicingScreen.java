@@ -254,7 +254,7 @@ public class AddServicingScreen extends Form implements Screen, ActionListener, 
         validCows = new Vector(allCows.length);
         if(allCows!=null){
             for(int i = 0; i < allCows.length; i++){
-                if(allCows[i].getSex().equals(Cow.SEX_FEMALE) && allCows[i].getEarTagNumber()!=null && allCows[i].getEarTagNumber().trim().length()>0){
+                if(allCows[i].getSex().equals(Cow.SEX_FEMALE)){// && allCows[i].getEarTagNumber()!=null && allCows[i].getEarTagNumber().trim().length()>0){
                     validCows.addElement(allCows[i]);
                 }
             }
@@ -372,7 +372,7 @@ public class AddServicingScreen extends Form implements Screen, ActionListener, 
         for(int i = 0; i < constraints.length; i++){
             EventConstraint currConstraint = constraints[i];
             
-            if(currConstraint.getEvent().equals(EventConstraint.CONSTRAINT_CALVING)){
+            if(currConstraint.getEvent().equals(EventConstraint.CONSTRAINT_MATURITY)){
                 if(selectedCow.getAgeMilliseconds()<currConstraint.getTimeMilliseconds()){
                     infoDialog.setText(Locale.getStringInLocale(locale, StringResources.cow_too_young));
                     cowCB.requestFocus();

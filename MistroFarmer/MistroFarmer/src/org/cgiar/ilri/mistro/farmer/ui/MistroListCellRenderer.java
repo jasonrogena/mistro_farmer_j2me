@@ -17,6 +17,11 @@ public class MistroListCellRenderer extends List implements ListCellRenderer{
         super();
         this.names=names;
     }
+    
+    public void updateList(String[] names){
+        this.names = names;
+    }
+    
     public Component getListCellRendererComponent(List list, Object value, int index, boolean isSelected) {
         Label label = new Label(names[index]);
         if(isSelected) {

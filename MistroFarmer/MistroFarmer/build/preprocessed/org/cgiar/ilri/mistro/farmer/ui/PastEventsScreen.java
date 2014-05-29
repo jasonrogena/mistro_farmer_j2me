@@ -111,6 +111,9 @@ public class PastEventsScreen extends Form implements Screen{
                         if(eventTypesInEN[k].equals(cowEvents[j].getType())){
                             eventType = eventTypes[k];
                         }
+                        else if(cowEvents[j].getType().equals("Calving")){
+                            eventType = Locale.getStringInLocale(locale, StringResources.calving);
+                        }
                     }
                     
                     Label eventTypeL = new Label(eventType);

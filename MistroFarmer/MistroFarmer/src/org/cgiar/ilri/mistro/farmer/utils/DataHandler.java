@@ -31,6 +31,7 @@ public class DataHandler {
     //private static final String BASE_URL="http://hpc.ilri.cgiar.org/~jrogena/mistro_web";
     private static final String BASE_URL="http://azizi.ilri.cgiar.org/ngombe_planner";
     public static final String FARMER_REGISTRATION_URL="/php/farmer/registration.php";
+    public static final String FARMER_FETCH_VETS_URL="/php/farmer/fetch_vets.php";
     public static final String FARMER_AUTHENTICATION_URL="/php/farmer/authentication.php";
     public static final String FARMER_SIM_CARD_REGISTRATION_URL="/php/farmer/sim_card_registration.php";
     public static final String FARMER_FETCH_COW_IDENTIFIERS_URL="/php/farmer/fetch_cow_identifiers.php";
