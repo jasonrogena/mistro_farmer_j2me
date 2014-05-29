@@ -203,7 +203,7 @@ public class CowRegistrationScreen extends Form implements Screen, ActionListene
         setLabelStyle(dateOfBirthL);
         this.addComponent(dateOfBirthL);
         
-        dateOfBirthS = Spinner.createDate(System.currentTimeMillis() - (31536000730l*20), System.currentTimeMillis(), System.currentTimeMillis(), '/', Spinner.DATE_FORMAT_DD_MM_YYYY);
+        dateOfBirthS = Spinner.createDate(System.currentTimeMillis() - (31536000730l*20), System.currentTimeMillis() + 86400000l, System.currentTimeMillis() + 86400000l, '/', Spinner.DATE_FORMAT_DD_MM_YYYY);
         //setComponentStyle(dateOfBirthS, true);
         //dateOfBirthS.getSelectedStyle().setFgColor(0x2ecc71);
         //this.addComponent(dateOfBirthS);
@@ -804,7 +804,10 @@ public class CowRegistrationScreen extends Form implements Screen, ActionListene
                 final InformationDialog infoDialog = new InformationDialog(Locale.getStringInLocale(locale, StringResources.error), locale, false);
                 infoDialog.setDialogType(Dialog.TYPE_ERROR);
                 
-                infoDialog.setText(Locale.getStringInLocale(locale, StringResources.something_went_wrong_try_again));
+                if(message.equals(DataHandler.CODE_NUMBER_IN_USE))
+                    infoDialog.setText(Locale.getStringInLocale(locale, StringResources.number_in_use));
+                else
+                    infoDialog.setText(Locale.getStringInLocale(locale, StringResources.something_went_wrong_try_again));
                 infoDialog.show();
             }
         }

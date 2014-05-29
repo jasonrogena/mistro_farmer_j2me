@@ -144,7 +144,7 @@ public class AddMilkProductionScreen extends Form implements Screen, ActionListe
         this.addComponent(dateB);
         
         
-        dateS = Spinner.createDate(System.currentTimeMillis() - (86400000l*15), System.currentTimeMillis(), System.currentTimeMillis(), '/', Spinner.DATE_FORMAT_DD_MM_YYYY);
+        dateS = Spinner.createDate(System.currentTimeMillis() - (86400000l*15), System.currentTimeMillis() + 86400000l, System.currentTimeMillis() + 86400000l, '/', Spinner.DATE_FORMAT_DD_MM_YYYY);
         //setComponentStyle(dateS, true);
         //this.addComponent(dateS);
         

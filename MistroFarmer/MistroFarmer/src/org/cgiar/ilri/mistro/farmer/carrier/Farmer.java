@@ -23,6 +23,7 @@ public class Farmer {
     private String latitude;
     private String simCardSN;
     private String mode;
+    private EventConstraint[] eventConstraints;
 
     /**
      * This is a constructor for the Farmer class.
@@ -60,6 +61,12 @@ public class Farmer {
             cows = new Cow[cowsJSONArray.length()];
             for(int i=0; i < cows.length; i++){
                 cows[i] = new Cow(cowsJSONArray.getJSONObject(i));
+            }
+            
+            JSONArray constraintJSONArray = farmerJSONObject.getJSONArray("event_constraints");
+            eventConstraints = new EventConstraint[constraintJSONArray.length()];
+            for(int i = 0; i < eventConstraints.length; i++){
+                eventConstraints[i] = new EventConstraint(constraintJSONArray.getJSONObject(i));
             }
             
             mode = "";
@@ -109,6 +116,10 @@ public class Farmer {
 
     public String getMode() {
         return this.mode;
+    }
+    
+    public EventConstraint[] getEventConstraints(){
+        return this.eventConstraints;
     }
 
     public void setCowNumber(int number) {

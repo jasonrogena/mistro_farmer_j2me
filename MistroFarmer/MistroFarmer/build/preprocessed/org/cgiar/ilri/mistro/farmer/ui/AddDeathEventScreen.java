@@ -127,7 +127,7 @@ public class AddDeathEventScreen extends Form implements Screen, ActionListener,
         setLabelStyle(dateL);
         this.addComponent(dateL);
         
-        dateS = Spinner.createDate(System.currentTimeMillis() - (86400000l*15), System.currentTimeMillis(), System.currentTimeMillis(), '/', Spinner.DATE_FORMAT_DD_MM_YYYY);
+        dateS = Spinner.createDate(System.currentTimeMillis() - (86400000l*15), System.currentTimeMillis() + 86400000l, System.currentTimeMillis() + 86400000l, '/', Spinner.DATE_FORMAT_DD_MM_YYYY);
         //setComponentStyle(dateS, true);
         //dateS.getSelectedStyle().setFgColor(0x2ecc71);
         //this.addComponent(dateS);

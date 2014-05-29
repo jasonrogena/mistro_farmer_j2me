@@ -12,6 +12,8 @@ import com.sun.lwuit.Form;
 import com.sun.lwuit.Label;
 import com.sun.lwuit.events.ActionEvent;
 import com.sun.lwuit.events.ActionListener;
+import com.sun.lwuit.layouts.BorderLayout;
+import com.sun.lwuit.plaf.Border;
 import com.sun.lwuit.table.TableLayout;
 import java.util.Vector;
 import org.cgiar.ilri.mistro.farmer.Midlet;
@@ -45,7 +47,8 @@ public class ProductionHistoryScreen extends Form implements Screen{
         this.locale = locale;
         this.farmer = farmer;
         
-        parentTableLayout= new TableLayout(getValidCows(), 4);
+        parentTableLayout= new TableLayout(getValidCows(), 3);
+        //parentTableLayout.setDefaultColumnWidth(-1);
         this.setLayout(parentTableLayout);
         
         backCommand = new Command(Locale.getStringInLocale(locale, StringResources.back));
@@ -65,27 +68,30 @@ public class ProductionHistoryScreen extends Form implements Screen{
         
         //cow   date    time    quantity (quantity_type)
         Label cowHeadingL = new Label(Locale.getStringInLocale(locale, StringResources.cow));
-        cowHeadingL.getStyle().setFont(Font.create(null).createSystemFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_MEDIUM));
+        cowHeadingL.getStyle().setFont(Font.create(null).createSystemFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+        cowHeadingL.getStyle().setBorder(Border.createEmpty());
         TableLayout.Constraint cowHeadingLC= parentTableLayout.createConstraint();
         cowHeadingLC.setWidthPercentage(35);
         this.addComponent(cowHeadingLC, cowHeadingL);
         
         Label dateHeadingL = new Label(Locale.getStringInLocale(locale, StringResources.date));
-        dateHeadingL.getStyle().setFont(Font.createSystemFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_MEDIUM));
+        dateHeadingL.getStyle().setFont(Font.createSystemFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+        dateHeadingL.getStyle().setBorder(Border.createEmpty());
         TableLayout.Constraint dateHeadingLC= parentTableLayout.createConstraint();
-        dateHeadingLC.setWidthPercentage(30);
+        dateHeadingLC.setWidthPercentage(45);
         this.addComponent(dateHeadingLC, dateHeadingL);
         
-        Label timeHeadingL = new Label(Locale.getStringInLocale(locale, StringResources.time));
-        timeHeadingL.getStyle().setFont(Font.createSystemFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_MEDIUM));
+        /*Label timeHeadingL = new Label(Locale.getStringInLocale(locale, StringResources.time));
+        timeHeadingL.getStyle().setFont(Font.createSystemFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
         TableLayout.Constraint timeHeadingLC = parentTableLayout.createConstraint();
         timeHeadingLC.setWidthPercentage(25);
-        this.addComponent(timeHeadingLC,timeHeadingL);
+        this.addComponent(timeHeadingLC,timeHeadingL);*/
         
         Label quantityHeadingL = new Label(Locale.getStringInLocale(locale, StringResources.quantity));
-        quantityHeadingL.getStyle().setFont(Font.createSystemFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_MEDIUM));
+        quantityHeadingL.getStyle().setFont(Font.createSystemFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+        quantityHeadingL.getStyle().setBorder(Border.createEmpty());
         TableLayout.Constraint quantityHeadingLC = parentTableLayout.createConstraint();
-        quantityHeadingLC.setWidthPercentage(15);
+        quantityHeadingLC.setWidthPercentage(25);
         this.addComponent(quantityHeadingLC, quantityHeadingL);
         
         Cow[] cows = farmer.getCows();
@@ -99,19 +105,36 @@ public class ProductionHistoryScreen extends Form implements Screen{
                     cowLC.setWidthPercentage(35);
                     if(cows[i].getName()!=null && cows[i].getName().trim().length()>0){
                         Label cowL = new Label(cows[i].getEarTagNumber()+" ("+cows[i].getName()+")");
+                        cowL.getStyle().setFont(Font.createSystemFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+                        cowL.getStyle().setBorder(Border.createEmpty());
                         this.addComponent(cowLC, cowL);
                     }
                     else{
                         Label cowL = new Label(cows[i].getEarTagNumber());
+                        cowL.getStyle().setFont(Font.createSystemFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+                        cowL.getStyle().setBorder(Border.createEmpty());
                         this.addComponent(cowLC, cowL);
                     }
                     
-                    Label dateL = new Label(milkProduction[j].getDate());
+                    Label dateL = new Label();
+                    dateL.getStyle().setBorder(Border.createEmpty());
+                    String date = milkProduction[j].getDate();
+                    String[] times = Locale.getStringArrayInLocale(locale, ArrayResources.milking_times);
+                    String[] timesInEN = Locale.getStringArrayInLocale(Locale.LOCALE_EN, ArrayResources.milking_times);
+                    String time = "";
+                    for(int k = 0; k < times.length; k++){
+                        if(timesInEN[k].equals(milkProduction[j].getTime())){
+                            time = times[k];
+                        }
+                    }
+                    dateL.setText(date + " " + time);
+                    dateL.getStyle().setFont(Font.createSystemFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
                     TableLayout.Constraint dateLC= parentTableLayout.createConstraint();
-                    dateLC.setWidthPercentage(30);
+                    dateLC.setWidthPercentage(45);
                     this.addComponent(dateLC, dateL);
                     
-                    Label timeL = new Label("");
+                    /*Label timeL = new Label("");
+                    timeL.getStyle().setFont(Font.createSystemFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
                     TableLayout.Constraint timeLC = parentTableLayout.createConstraint();
                     timeLC.setWidthPercentage(25);
                     String[] times = Locale.getStringArrayInLocale(locale, ArrayResources.milking_times);
@@ -121,7 +144,7 @@ public class ProductionHistoryScreen extends Form implements Screen{
                             timeL.setText(times[k]);
                         }
                     }
-                    this.addComponent(timeLC, timeL);
+                    this.addComponent(timeLC, timeL);*/
                     
                     String quantityType = "";
                     String[] quantityTypes = Locale.getStringArrayInLocale(locale, ArrayResources.quantity_types);
@@ -133,8 +156,10 @@ public class ProductionHistoryScreen extends Form implements Screen{
                     }
                     
                     Label quantityL = new Label(String.valueOf(milkProduction[j].getQuantity())+" ("+quantityType+")");
+                    quantityL.getStyle().setBorder(Border.createEmpty());
+                    quantityL.getStyle().setFont(Font.createSystemFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
                     TableLayout.Constraint quantityLC = parentTableLayout.createConstraint();
-                    quantityLC.setWidthPercentage(15);
+                    quantityLC.setWidthPercentage(25);
                     this.addComponent(quantityLC, quantityL);
                 }
             }

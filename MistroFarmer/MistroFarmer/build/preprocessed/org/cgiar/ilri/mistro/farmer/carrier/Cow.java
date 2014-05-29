@@ -15,12 +15,16 @@ public class Cow {
     public static final String SEX_FEMALE = "Female";
     public static final String AGE_TYPE_DAY = "Days";
     public static final String AGE_TYPE_WEEK = "Weeks";
+    public static final String AGE_TYPE_MONTH = "Months";
     public static final String AGE_TYPE_YEAR = "Years";
     public static final String MODE_ADULT_COW_REGISTRATION = "adultCowRegistration";
     public static final String MODE_BORN_CALF_REGISTRATION = "bornCalfRegistration";
     public static final String SERVICE_TYPE_BULL = "Bull";
     public static final String SERVICE_TYPE_AI = "Artificial Insemination";
     public static final String SERVICE_TYPE_ET = "Embryo Transfer";
+    
+    private final String DEFAULT_DOB = "0000-00-00 00:00:00";
+    
     private String name;
     private String earTagNumber;
     private String dateOfBirth;
@@ -40,6 +44,7 @@ public class Cow {
     private Date dateOfBirthDate;
     private MilkProduction[] milkProduction;
     private Event[] events;
+    private String dateAdded;
 
     /**
      * Constructor for the Cow class.
@@ -70,6 +75,7 @@ public class Cow {
         serviceType = "";
         otherDeformity = "";
         piggyBack = "";
+        dateAdded = "";
     }
     
     /**
@@ -124,6 +130,8 @@ public class Cow {
             else{
                 events = new Event[0];
             }
+            
+            dateAdded = cowJSONObject.getString("date_added");
         } 
         catch (JSONException ex) {
             ex.printStackTrace();
@@ -218,9 +226,71 @@ public class Cow {
             return dateOfBirthDate.getTime();
         else return -1;
     }
+    
+    public long getAgeMilliseconds(){
+        Date today = new Date();
+        
+        long ageFromDOB = 0;
+        if(this.dateOfBirth.length()>0 && !this.dateOfBirth.equals(DEFAULT_DOB)){
+            ageFromDOB = today.getTime() - convertStringToDate(this.dateOfBirth).getTime();
+        }
+        else{
+            System.out.println("Date of birth is either null or default");
+        }
+            
+        
+        long ageFromAge = 0;
+        
+        long ageUnits = 0;
+        
+        if(ageType.equals(AGE_TYPE_DAY)) ageUnits = 86400000l;
+        else if(ageType.equals(AGE_TYPE_MONTH)) ageUnits = 86400000l * 30;
+        else if(ageType.equals(AGE_TYPE_YEAR)) ageUnits = 86400000l * 365;
+        
+        ageFromAge = age * ageUnits;
+        
+        long addToAge = today.getTime() - convertStringToDate(this.dateAdded).getTime();
+        
+        ageFromAge = ageFromAge + addToAge;
+        
+        System.out.println("Age of cow is "+String.valueOf(this.age)+" "+this.ageType);
+        System.out.println("DOB of cow is "+this.dateOfBirth);
+        
+        if(ageFromAge > ageFromDOB){
+            System.out.println("Age more feasibly than date of birth. Using age");
+            System.out.println("Age in milliseconds = "+String.valueOf(ageFromAge));
+            System.out.println("Alternate age in milliseconds = "+String.valueOf(ageFromDOB));
+            return ageFromAge;
+        }
+        else{
+            System.out.println("DOB more feasibly than age. Using DOB");
+            System.out.println("Age in milliseconds = "+String.valueOf(ageFromDOB));
+            System.out.println("Alternate age in milliseconds = "+String.valueOf(ageFromAge));
+            return ageFromDOB;
+        }
+    }
+    
+    private Date convertStringToDate(String date){
+        //takes date of type yyyy-MM-dd hh:mm:ss
+        Calendar c = Calendar.getInstance();
+
+        c.set(Calendar.YEAR, Integer.parseInt(date.substring(0, 4)));
+        c.set(Calendar.MONTH, Integer.parseInt(date.substring(5, 7)) - 1);
+        c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date.substring(8, 10)));
+        
+        return c.getTime();
+    }
 
     public int getAge() {
         return age;
+    }
+    
+    public String getDateAdded(){
+        return dateAdded;
+    }
+    
+    public void setDateAdded(String dateAdded){
+        this.dateAdded = dateAdded;
     }
 
     public String getPiggyBack() {

@@ -19,6 +19,7 @@ import org.json.me.JSONObject;
  */
 public class DataHandler {
     public static final String ACKNOWLEDGE_OK="533783";
+    public static final String CODE_NUMBER_IN_USE = "032443";
     public static final String NO_DATA="77732";
     public static final String DATA_ERROR="934342";
     public static final String CODE_USER_NOT_AUTHENTICATED="43322";

@@ -33,6 +33,12 @@ public class StringResources {
         "Number of Cows",
         "Idadi ya ng'ombe"
     };
+    
+    public static final String[] number_in_use = {
+        "The mobile number you are trying to register has already been registered under another farmer",
+        ""
+    };
+    
     public static final String[] name = {
         "Name",
         "Jina"
@@ -539,6 +545,10 @@ public class StringResources {
     };
     public static final String[] click_to_set_date = {
         "Click to set the date",
+        ""
+    };
+    public static final String[] cow_too_young = {
+        "Selected cow is too young",
         ""
     };
 }

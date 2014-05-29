@@ -25,6 +25,7 @@ import java.util.Vector;
 import org.cgiar.ilri.mistro.farmer.Midlet;
 import org.cgiar.ilri.mistro.farmer.carrier.Cow;
 import org.cgiar.ilri.mistro.farmer.carrier.Event;
+import org.cgiar.ilri.mistro.farmer.carrier.EventConstraint;
 import org.cgiar.ilri.mistro.farmer.carrier.Farmer;
 import org.cgiar.ilri.mistro.farmer.ui.localization.ArrayResources;
 import org.cgiar.ilri.mistro.farmer.ui.localization.Locale;
@@ -132,7 +133,7 @@ public class AddGenericEventScreen extends Form implements Screen, ActionListene
         setLabelStyle(dateL);
         this.addComponent(dateL);
         
-        dateS = Spinner.createDate(System.currentTimeMillis() - (86400000l*15), System.currentTimeMillis(), System.currentTimeMillis(), '/', Spinner.DATE_FORMAT_DD_MM_YYYY);
+        dateS = Spinner.createDate(System.currentTimeMillis() - (86400000l*15), System.currentTimeMillis() + 86400000l, System.currentTimeMillis() + 86400000l, '/', Spinner.DATE_FORMAT_DD_MM_YYYY);
         //setComponentStyle(dateS, true);
         //dateS.getSelectedStyle().setFgColor(0x2ecc71);
         //this.addComponent(dateS);
@@ -190,9 +191,9 @@ public class AddGenericEventScreen extends Form implements Screen, ActionListene
         Cow[] allCows = farmer.getCows();
         validCows = new Vector(allCows.length);
         for(int i = 0; i < allCows.length; i++){
-            if(allCows[i].getEarTagNumber()!=null && allCows[i].getEarTagNumber().trim().length()>0){
-                validCows.addElement(allCows[i]);
-            }
+            //if(allCows[i].getEarTagNumber()!=null && allCows[i].getEarTagNumber().trim().length()>0){
+            validCows.addElement(allCows[i]);
+            //}
         }
         
         String[] cowNames = new String[validCows.size()];
@@ -217,6 +218,57 @@ public class AddGenericEventScreen extends Form implements Screen, ActionListene
             infoDialog.show();
             return false;
         }
+        
+        else if(eventType.equals("Start of Lactation")){
+            Cow selectedCow = (Cow)validCows.elementAt(cowCB.getSelectedIndex());
+            EventConstraint[] constraints = farmer.getEventConstraints();
+            for(int i = 0; i < constraints.length; i++){
+                EventConstraint currConstraint = constraints[i];
+
+                if(currConstraint.getEvent().equals(EventConstraint.CONSTRAINT_CALVING)){
+                    if(selectedCow.getAgeMilliseconds()<currConstraint.getTimeMilliseconds()){
+                        infoDialog.setText(Locale.getStringInLocale(locale, StringResources.cow_too_young));
+                        cowCB.requestFocus();
+                        infoDialog.show();
+                        return false;
+                    }
+                }
+            }
+        }
+        
+        else if(eventType.equals("Dry Off")){
+            Cow selectedCow = (Cow)validCows.elementAt(cowCB.getSelectedIndex());
+            EventConstraint[] constraints = farmer.getEventConstraints();
+            for(int i = 0; i < constraints.length; i++){
+                EventConstraint currConstraint = constraints[i];
+
+                if(currConstraint.getEvent().equals(EventConstraint.CONSTRAINT_MILKING)){
+                    if(selectedCow.getAgeMilliseconds()<currConstraint.getTimeMilliseconds()){
+                        infoDialog.setText(Locale.getStringInLocale(locale, StringResources.cow_too_young));
+                        cowCB.requestFocus();
+                        infoDialog.show();
+                        return false;
+                    }
+                }
+            }
+        }
+        
+        else if(eventType.equals("Signs of Heat")){
+            Cow selectedCow = (Cow)validCows.elementAt(cowCB.getSelectedIndex());
+            EventConstraint[] constraints = farmer.getEventConstraints();
+            for(int i = 0; i < constraints.length; i++){
+                EventConstraint currConstraint = constraints[i];
+
+                if(currConstraint.getEvent().equals(EventConstraint.CONSTRAINT_MATURITY)){
+                    if(selectedCow.getAgeMilliseconds()<currConstraint.getTimeMilliseconds()){
+                        infoDialog.setText(Locale.getStringInLocale(locale, StringResources.cow_too_young));
+                        cowCB.requestFocus();
+                        infoDialog.show();
+                        return false;
+                    }
+                }
+            }
+        }
         return true;
     }
     
@@ -227,7 +279,7 @@ public class AddGenericEventScreen extends Form implements Screen, ActionListene
         long timeDiffDays = (currentTime - dateSelected.getTime())/86400000;
         
         if(timeDiffDays > Event.MAX_EVENT_DAYS){
-            return Locale.getStringInLocale(locale, StringResources.milk_data_too_old);
+            return Locale.getStringInLocale(locale, StringResources.event_too_old);
         }
         else if(timeDiffDays < 0){
             return Locale.getStringInLocale(locale, StringResources.date_in_future);

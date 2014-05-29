@@ -26,6 +26,7 @@ import org.cgiar.ilri.mistro.farmer.Midlet;
 import org.cgiar.ilri.mistro.farmer.carrier.Cow;
 import org.cgiar.ilri.mistro.farmer.carrier.Dam;
 import org.cgiar.ilri.mistro.farmer.carrier.Event;
+import org.cgiar.ilri.mistro.farmer.carrier.EventConstraint;
 import org.cgiar.ilri.mistro.farmer.carrier.Farmer;
 import org.cgiar.ilri.mistro.farmer.ui.localization.ArrayResources;
 import org.cgiar.ilri.mistro.farmer.ui.localization.Locale;
@@ -91,6 +92,8 @@ public class AddCalvingScreen extends Form implements Screen, DateDialog.OnDateE
                         JSONObject jSONObject = new JSONObject();
                         Cow selectedCow = (Cow)validCows.elementAt(cowCB.getSelectedIndex());
                         try {
+                            jSONObject.put("motherETN", selectedCow.getEarTagNumber());
+                            jSONObject.put("motherName", selectedCow.getName());
                             jSONObject.put("birthType",birthTypesInEN[typeCB.getSelectedIndex()]);
                             jSONObject.put("eventType","Birth");
                             //jSONObject.put("liveBirths",birthsTF.getText());
@@ -159,7 +162,7 @@ public class AddCalvingScreen extends Form implements Screen, DateDialog.OnDateE
         setLabelStyle(dateL);
         this.addComponent(dateL);
         
-        dateS = Spinner.createDate(System.currentTimeMillis() - (86400000l*15), System.currentTimeMillis(), System.currentTimeMillis(), '/', Spinner.DATE_FORMAT_DD_MM_YYYY);
+        dateS = Spinner.createDate(System.currentTimeMillis() - (86400000l*15), System.currentTimeMillis() + 86400000l, System.currentTimeMillis() + 86400000l, '/', Spinner.DATE_FORMAT_DD_MM_YYYY);
         //setComponentStyle(dateS, true);
         //dateS.getSelectedStyle().setFgColor(0x2ecc71);
         //this.addComponent(dateS);
@@ -248,6 +251,22 @@ public class AddCalvingScreen extends Form implements Screen, DateDialog.OnDateE
             infoDialog.show();
             return false;
         }
+        
+        Cow selectedCow = (Cow)validCows.elementAt(cowCB.getSelectedIndex());
+        EventConstraint[] constraints = farmer.getEventConstraints();
+        for(int i = 0; i < constraints.length; i++){
+            EventConstraint currConstraint = constraints[i];
+            
+            if(currConstraint.getEvent().equals(EventConstraint.CONSTRAINT_CALVING)){
+                if(selectedCow.getAgeMilliseconds()<currConstraint.getTimeMilliseconds()){
+                    infoDialog.setText(Locale.getStringInLocale(locale, StringResources.cow_too_young));
+                    cowCB.requestFocus();
+                    infoDialog.show();
+                    return false;
+                }
+            }
+        }
+        
         return true;
     }
     
