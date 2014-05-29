@@ -14,7 +14,7 @@ import org.cgiar.ilri.mistro.farmer.ui.localization.Locale;
 public class Midlet extends MIDlet {
     private final int locale = Locale.LOCALE_EN;
     public final String APP_NAME = "Ng'ombe Planner";
-    public final String APP_VERSION = "O.8.19";
+    public final String APP_VERSION = "O.8.2";
     
     /**
      * Insert code here that you want to run before the application starts
