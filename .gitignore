@@ -1,1 +1,8 @@
+#generated java class files
 *.class
+
+#the JavaME build directory
+MistroFarmer/MistroFarmer/build/
+
+#the JavaME dist directory
+MistroFarmer/MistroFarmer/dist/
