@@ -47,12 +47,12 @@ public class ArrayResources {
         {"",""}
     };
     public static final String[][] cow_event_types = {
-        {"Abortion","Birth","Start of Lactation","Dry Off","Bloat","Sickness","Death","Acquisition","Sale","Artificial Insemination","Bull Servicing","Signs of Heat"},
-        {"","","","","","","","","","","",""}
+        {"Abortion","Birth","Start of Lactation","Dry Off","Bloat","Sickness","Death","Acquisition","Sale","Artificial Insemination","Bull Servicing","Signs of Heat", "Deworming", "Dipping or Spraying", "Vaccination"},
+        {"","","","","","","","","","","","", "", "", ""}
     };
     public static final String[][] generic_cow_event_types = {
-        {"Start of Lactation","Dry Off","Bloat","Sickness","Death","Acquisition","Sale","Signs of Heat"},
-        {"","","","","","","",""}
+        {"Start of Lactation","Dry Off","Bloat","Sickness","Death","Acquisition","Sale","Signs of Heat", "Deworming", "Dipping or Spraying", "Vaccination"},
+        {"","","","","","","","", "", "", ""}
     };
     public static final String[][] birth_types = {
         {"Normal","Still","Premature","Abortion"},

@@ -99,7 +99,7 @@ public class FarmerRegistrationScreen extends Form implements Screen, ResponseLi
             }
         });
         
-        fullNameL = new Label(Locale.getStringInLocale(locale, StringResources.full_name));
+        fullNameL = new Label(" * "+Locale.getStringInLocale(locale, StringResources.full_name));
         fullNameL.getStyle().setMargin(10, 0, 10, 0);
         fullNameL.getSelectedStyle().setMargin(10, 0, 10,0);
         this.addComponent(fullNameL);
@@ -109,7 +109,7 @@ public class FarmerRegistrationScreen extends Form implements Screen, ResponseLi
         fullNameTF.getSelectedStyle().setMargin(5, 0, 0, 0);
         this.addComponent(fullNameTF);
         
-        mobileNoL = new Label(Locale.getStringInLocale(locale, StringResources.mobile_number));
+        mobileNoL = new Label(" * "+Locale.getStringInLocale(locale, StringResources.mobile_number));
         mobileNoL.getStyle().setMargin(10, 0, 10, 0);
         mobileNoL.getSelectedStyle().setMargin(10, 0, 10, 0);
         this.addComponent(mobileNoL);
@@ -134,7 +134,7 @@ public class FarmerRegistrationScreen extends Form implements Screen, ResponseLi
         ePersonnelCB.setRenderer(new MistroListCellRenderer(vetNames));
         this.addComponent(ePersonnelCB);
         
-        preferredLanguageL = new Label(Locale.getStringInLocale(locale, StringResources.preferred_language));
+        preferredLanguageL = new Label(" * "+Locale.getStringInLocale(locale, StringResources.preferred_language));
         preferredLanguageL.getStyle().setMargin(10, 0, 10, 0);
         preferredLanguageL.getSelectedStyle().setMargin(10, 0, 10, 0);
         this.addComponent(preferredLanguageL);
@@ -147,7 +147,7 @@ public class FarmerRegistrationScreen extends Form implements Screen, ResponseLi
         preferredLanguageCB.setRenderer(new MistroListCellRenderer(languages));
         this.addComponent(preferredLanguageCB);
         
-        cowNumberL = new Label(Locale.getStringInLocale(locale, StringResources.number_of_cows));
+        cowNumberL = new Label(" * "+Locale.getStringInLocale(locale, StringResources.number_of_cows));
         cowNumberL.getStyle().setMargin(10, 0, 10, 0);
         cowNumberL.getSelectedStyle().setMargin(10, 0, 10, 0);
         this.addComponent(cowNumberL);
@@ -251,7 +251,14 @@ public class FarmerRegistrationScreen extends Form implements Screen, ResponseLi
     public void responseGotten(Object source, String message) {
         System.out.println("Message = "+message);
         if(this.farmer != null && source.getClass() == this.farmer.getClass()){
-            if(message.equals(DataHandler.ACKNOWLEDGE_OK)){
+            if(message == null){
+                final InformationDialog infoDialog = new InformationDialog(Locale.getStringInLocale(locale, StringResources.error), locale, false);
+                infoDialog.setDialogType(Dialog.TYPE_ERROR);
+
+                infoDialog.setText(Locale.getStringInLocale(locale, StringResources.something_went_wrong_try_again));
+                infoDialog.show();
+            }
+            else if(message.equals(DataHandler.ACKNOWLEDGE_OK)){
                 final InformationDialog infoDialog = new InformationDialog(Locale.getStringInLocale(locale, StringResources.successful_registration), locale, true);
 
                 infoDialog.addCommandListener(new ActionListener() {
@@ -267,11 +274,11 @@ public class FarmerRegistrationScreen extends Form implements Screen, ResponseLi
                 infoDialog.setText(Locale.getStringInLocale(locale, StringResources.successful_registration_instructions));
                 infoDialog.show();
             }
-            else{
+            else if (message.equals(DataHandler.CODE_NUMBER_IN_USE)){
                 final InformationDialog infoDialog = new InformationDialog(Locale.getStringInLocale(locale, StringResources.error), locale, false);
                 infoDialog.setDialogType(Dialog.TYPE_ERROR);
 
-                infoDialog.setText(Locale.getStringInLocale(locale, StringResources.something_went_wrong_try_again));
+                infoDialog.setText(Locale.getStringInLocale(locale, StringResources.number_in_use));
                 infoDialog.show();
             }
         }

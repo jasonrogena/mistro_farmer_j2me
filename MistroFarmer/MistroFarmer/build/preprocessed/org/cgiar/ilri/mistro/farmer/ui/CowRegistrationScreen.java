@@ -5,13 +5,16 @@ import com.sun.lwuit.ComboBox;
 import com.sun.lwuit.Command;
 import com.sun.lwuit.Component;
 import com.sun.lwuit.Dialog;
+import com.sun.lwuit.Font;
 import com.sun.lwuit.Form;
 import com.sun.lwuit.Label;
 import com.sun.lwuit.TextArea;
 import com.sun.lwuit.TextField;
 import com.sun.lwuit.events.ActionEvent;
 import com.sun.lwuit.events.ActionListener;
+import com.sun.lwuit.layouts.BorderLayout;
 import com.sun.lwuit.layouts.BoxLayout;
+import com.sun.lwuit.plaf.Border;
 import com.sun.lwuit.spinner.Spinner;
 import java.util.Date;
 import java.util.Vector;
@@ -47,10 +50,12 @@ public class CowRegistrationScreen extends Form implements Screen, ActionListene
     private Command nextCommand;
     
     private BoxLayout parentBoxLayout;
+    private TextArea nameOrEarTagNumberTA;
     private Label cowNameL;
     private TextField cowNameTF;
     private Label earTagNumberL;
     private TextField earTagNumberTF;
+    private TextArea ageOrDOBTA;
     private Label ageL;
     private TextField ageTF;
     private Label ageTypeL;
@@ -164,6 +169,10 @@ public class CowRegistrationScreen extends Form implements Screen, ActionListene
             }
         });
         
+        nameOrEarTagNumberTA = new TextArea(" * "+Locale.getStringInLocale(locale, StringResources.name_or_ear_tag_number));
+        setMultilineLableStyle(nameOrEarTagNumberTA);
+        this.addComponent(nameOrEarTagNumberTA);
+        
         cowNameL = new Label(Locale.getStringInLocale(locale, StringResources.name));
         setLabelStyle(cowNameL);
         this.addComponent(cowNameL);
@@ -179,6 +188,19 @@ public class CowRegistrationScreen extends Form implements Screen, ActionListene
         earTagNumberTF = new TextField();
         setComponentStyle(earTagNumberTF, false);
         this.addComponent(earTagNumberTF);
+        
+        sexL = new Label(" * "+Locale.getStringInLocale(locale, StringResources.sex));
+        setLabelStyle(sexL);
+        this.addComponent(sexL);
+        
+        sexCB = new ComboBox(Locale.getStringArrayInLocale(locale, ArrayResources.sex_array));
+        setComponentStyle(sexCB, true);
+        sexCB.setRenderer(new MistroListCellRenderer(Locale.getStringArrayInLocale(locale, ArrayResources.sex_array)));
+        this.addComponent(sexCB);
+        
+        ageOrDOBTA = new TextArea(" * "+Locale.getStringInLocale(locale, StringResources.age_or_dob));
+        setMultilineLableStyle(ageOrDOBTA);
+        this.addComponent(ageOrDOBTA);
         
         ageL = new Label(Locale.getStringInLocale(locale, StringResources.age));
         setLabelStyle(ageL);
@@ -223,15 +245,6 @@ public class CowRegistrationScreen extends Form implements Screen, ActionListene
         breedCB.addActionListener(breedMultiselectRenderer);
         this.addComponent(breedCB);
         
-        sexL = new Label(Locale.getStringInLocale(locale, StringResources.sex));
-        setLabelStyle(sexL);
-        this.addComponent(sexL);
-        
-        sexCB = new ComboBox(Locale.getStringArrayInLocale(locale, ArrayResources.sex_array));
-        setComponentStyle(sexCB, true);
-        sexCB.setRenderer(new MistroListCellRenderer(Locale.getStringArrayInLocale(locale, ArrayResources.sex_array)));
-        this.addComponent(sexCB);
-        
         deformityL = new Label(Locale.getStringInLocale(locale, StringResources.deformity));
         setLabelStyle(deformityL);
         this.addComponent(deformityL);
@@ -273,6 +286,15 @@ public class CowRegistrationScreen extends Form implements Screen, ActionListene
         sireCB.setRenderer(new MistroListCellRenderer(sireNames));
         this.addComponent(sireCB);
         
+        countryL = new Label(Locale.getStringInLocale(locale, StringResources.sire_country_of_origin));
+        setLabelStyle(countryL);
+        this.addComponent(countryL);
+        
+        countryCB = new ComboBox(GeneralArrays.all_countries);
+        setComponentStyle(countryCB, true);
+        countryCB.setRenderer(new MistroListCellRenderer(GeneralArrays.all_countries));
+        this.addComponent(countryCB);
+        
         strawNumberL = new Label(Locale.getStringInLocale(locale, StringResources.straw_number));
         setLabelStyle(strawNumberL);
         this.addComponent(strawNumberL);
@@ -301,15 +323,6 @@ public class CowRegistrationScreen extends Form implements Screen, ActionListene
         embryoNumberTF = new TextField();
         setComponentStyle(embryoNumberTF, false);
         this.addComponent(embryoNumberTF);
-        
-        countryL = new Label(Locale.getStringInLocale(locale, StringResources.sire_country_of_origin));
-        setLabelStyle(countryL);
-        this.addComponent(countryL);
-        
-        countryCB = new ComboBox(GeneralArrays.all_countries);
-        setComponentStyle(countryCB, true);
-        countryCB.setRenderer(new MistroListCellRenderer(GeneralArrays.all_countries));
-        this.addComponent(countryCB);
         
         restoreCowDetails();
     }
@@ -778,12 +791,30 @@ public class CowRegistrationScreen extends Form implements Screen, ActionListene
             component.setFocusable(false);
         }
     }
+    
+    private void setMultilineLableStyle(TextArea textArea){
+        textArea.getStyle().setFont(Font.createSystemFont(Font.FACE_SYSTEM, Font.STYLE_ITALIC, Font.SIZE_SMALL));
+        textArea.setRows(2);  
+        textArea.setVisible(true);  
+        textArea.setEditable(false); 
+        textArea.setFocusable(false);
+        Border border= Border.createEmpty();
+        textArea.getStyle().setBorder(border);
+        textArea.getStyle().setMargin(10, 0, 10, 0);
+    }
 
     public void responseGotten(Object source, String message) {
         System.out.println("Response gotten from server");
         if(farmer.getMode().equals(Farmer.MODE_INITIAL_REGISTRATION)){
             System.out.println("farmer mode is initial reg");
-            if(message.equals(DataHandler.ACKNOWLEDGE_OK)){
+            if(message == null){
+                final InformationDialog infoDialog = new InformationDialog(Locale.getStringInLocale(locale, StringResources.error), locale, false);
+                infoDialog.setDialogType(Dialog.TYPE_ERROR);
+
+                infoDialog.setText(Locale.getStringInLocale(locale, StringResources.something_went_wrong_try_again));
+                infoDialog.show();
+            }
+            else if(message.equals(DataHandler.ACKNOWLEDGE_OK)){
                 final InformationDialog infoDialog = new InformationDialog(Locale.getStringInLocale(locale, StringResources.successful_registration), locale, true);
                 infoDialog.setDialogType(Dialog.TYPE_CONFIRMATION);
                 

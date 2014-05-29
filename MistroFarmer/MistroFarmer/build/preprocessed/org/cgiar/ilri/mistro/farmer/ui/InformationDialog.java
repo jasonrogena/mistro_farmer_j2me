@@ -13,6 +13,7 @@ import com.sun.lwuit.TextArea;
 import com.sun.lwuit.TextField;
 import com.sun.lwuit.events.ActionEvent;
 import com.sun.lwuit.events.ActionListener;
+import com.sun.lwuit.plaf.Border;
 import org.cgiar.ilri.mistro.farmer.ui.localization.Locale;
 import org.cgiar.ilri.mistro.farmer.ui.localization.StringResources;
 
@@ -67,6 +68,7 @@ public class InformationDialog extends Dialog {
         text.setSingleLineTextArea(false);
         text.getStyle().setAlignment(CENTER);
         text.getStyle().setMargin(10, 10, 12, 12);
+        text.getStyle().setBorder(Border.createEmpty());
         this.addComponent(text);
     }
     

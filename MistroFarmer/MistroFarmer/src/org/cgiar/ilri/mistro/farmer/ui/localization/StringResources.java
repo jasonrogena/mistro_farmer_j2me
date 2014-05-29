@@ -556,4 +556,19 @@ public class StringResources {
         "Preferred Language",
         ""
     };
+    
+    public static final String[] name_or_ear_tag_number = {
+        "You can enter either the cow's name or ear tag number",
+        ""
+    };
+    
+    public static final String[] age_or_dob = {
+        "You can enter eith the cow's age or date or birth",
+        ""
+    };
+    
+    public static final String[] enter_age_or_dob = {
+        "Please enter either the cow's age or date of birth",
+        ""
+    };
 }
